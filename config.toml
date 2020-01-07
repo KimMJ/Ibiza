@@ -1,9 +1,9 @@
-baseURL = "http://localhost/"
+baseURL = "http://192.168.8.21/"
 languageCode = "en-us"
 title = "Ibiza"
 
 
-theme = "hugo-theme-learn" 
+theme = [ "mj-custom-theme", "hugo-theme-learn" ]
 
 [outputs]
 home = [ "HTML", "RSS", "JSON" ]
@@ -37,4 +37,47 @@ home = [ "HTML", "RSS", "JSON" ]
   # Order sections in menu by "weight" or "title". Default to "weight"
   ordersectionsby = "weight"
   # Change default color scheme with a variant one. Can be "red", "blue", "green".
-  themeVariant = ""
+  themeVariant = "mine"
+
+[[menu.shortcuts]] 
+name = "<i class='fab fa-github'></i> Github"
+identifier = "ds"
+url = "https://github.com/KimMJ"
+weight = 10
+
+# [[menu.shortcuts]]
+# name = "<i class='fas fa-camera'></i> Showcases"
+# url = "/showcase"
+# weight = 11
+
+[[menu.shortcuts]]
+name = "<i class='fas fa-bookmark'></i> Hugo Documentation"
+identifier = "hugodoc"
+url = "https://gohugo.io/"
+weight = 20
+
+# [[menu.shortcuts]]
+# name = "<i class='fas fa-bullhorn'></i> Credits"
+# url = "/credits"
+# weight = 30
+
+[[menu.shortcuts]]
+name = "<i class='fas fa-tags'></i> Tags"
+url = "/tags"
+weight = 30
+
+# # English is the default language
+# defaultContentLanguage = "ko"
+# # Force to have /en/my-page and /fr/my-page routes, even for default language.
+# defaultContentLanguageInSubdir = false
+
+# [Languages]
+# [Languages.en]
+# title = "Documentation for Hugo Learn Theme"
+# weight = 2
+# languageName = "English"
+
+# [Languages.kr]
+# title = "Hugo Learn의 문서"
+# weight = 1
+# languageName = "Korean"

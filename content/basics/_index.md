@@ -1,10 +1,10 @@
-+++
-title = "Basics"
-date = 2020-01-07T22:08:55+09:00
-weight = 5
-chapter = true
-pre = "<b>X. </b>"
-+++
+---
+title: "Basics"
+date: 2020-01-07T22:08:55+09:00
+weight: 5
+chapter: true
+pre: ""
+---
 
 ### Chapter 1
 
