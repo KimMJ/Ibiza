@@ -2,5 +2,5 @@
 	path = themes/hugo-theme-learn
 	url = https://github.com/matcornic/hugo-theme-learn.git
 [submodule "themes/mj-custom-theme"]
-  path = themes/mj-custom-theme
-  url = https://github.com/KimMJ/mj-custom-theme.git
+	path = themes/mj-custom-theme
+	url = https://github.com/KimMJ/mj-custom-theme.git
