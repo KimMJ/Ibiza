@@ -6,6 +6,4 @@ weight = 1
 
 # Ibiza
 
-<i class="fas fa-heart"></i> Do Learn
-
-Built with <i class="fas fa-heart"></i> from Grav and Hugo 
+배우고 배우자.
