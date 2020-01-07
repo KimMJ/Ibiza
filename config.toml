@@ -1,0 +1,8 @@
+baseURL = "http://localhost/"
+languageCode = "en-us"
+title = "Ibiza"
+
+theme = "hugo-theme-learn" 
+
+[outputs]
+home = [ "HTML", "RSS", "JSON" ]
