@@ -5,6 +5,9 @@ title = "Ibiza"
 
 theme = [ "mj-custom-theme", "hugo-theme-learn" ]
 
+[markup.goldmark.renderer]
+unsafe= true
+
 [outputs]
 home = [ "HTML", "RSS", "JSON" ]
 
