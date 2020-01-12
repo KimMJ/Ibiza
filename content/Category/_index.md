@@ -1,5 +1,6 @@
 ---
 title: "Category"
+menuTitle: "Computer Science"
 date: 2020-01-08T02:09:58+09:00
 weight: 5
 chapter: true
