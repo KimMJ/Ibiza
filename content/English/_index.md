@@ -6,8 +6,6 @@ chapter: true
 pre: ""
 ---
 
-### Chapter X
+# English
 
-# Some Chapter title
-
-Lorem Ipsum.
+To Learn English

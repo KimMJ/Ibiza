@@ -6,8 +6,6 @@ chapter: true
 pre: ""
 ---
 
-### Chapter X
+### HIMWM
 
-# Some Chapter title
-
-Lorem Ipsum.
+# Season1
