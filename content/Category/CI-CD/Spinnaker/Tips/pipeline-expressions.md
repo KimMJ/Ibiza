@@ -2,6 +2,7 @@
 title: "Pipeline Expressions"
 date: 2020-01-10T01:33:32+09:00
 draft: false
+tags: [ "spinnaker", "pipeline" ]
 ---
 
 Spinnaker는 배포를 자동화할 때 사용합니다. 

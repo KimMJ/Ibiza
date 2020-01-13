@@ -4,6 +4,7 @@ date: 2020-01-10T01:02:39+09:00
 draft: false
 chapter: false
 weight: 1
+tags: ["install", "spinnaker"]
 ---
 
 ## Overview of install Spinnaker
