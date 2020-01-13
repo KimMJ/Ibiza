@@ -3,6 +3,7 @@ title: "Importance of Record"
 date: 2020-01-10T00:47:03+09:00
 draft: false
 tags: ["record", "blog"]
+weight: 1
 ---
 
 ## 기록의 중요성

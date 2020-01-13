@@ -5,8 +5,6 @@ weight: 5
 chapter: true
 ---
 
-### Chapter X
+### Ubuntu
 
-# Some Chapter title
-
-Lorem Ipsum.
+# Network
