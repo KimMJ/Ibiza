@@ -84,7 +84,7 @@ adduser spinnaker sudo
 `vi /opt/halyard/bin/halyard`을 통해 `halyard`의 jvm 옵션을 추가할 수 있습니다.
 
 ```bash
-DEFAULT_JVM_OPTS='"-Djava.security.egd=file:/dev/./urandom" "-Dspring.config.additional-location=/opt/spinnaker/config/" "-Dhttps.proxyHost=<httpsProxyHost> -Dhttps.proxyPort=<httpsPort>" "-Dhttp.proxyHost=<httpProxyHost> -Dhttp.proxyPort=<httpPort>"'
+DEFAULT_JVM_OPTS='"-Djava.security.egd=file:/dev/./urandom" "-Dspring.config.additional-location=/opt/spinnaker/config/" "-Dhttps.proxyHost=<proxyHost> -Dhttps.proxyPort=<proxyPort>" "-Dhttp.proxyHost=<proxyHost> -Dhttp.proxyPort=<proxyPort>"'
 ```
 
 위의 설정에서 다음과 같이 proxy를 추가해줍니다. 그 다음 `halyard`를 재시동합니다.
@@ -162,6 +162,7 @@ curl storage.googleapis.com/halconfig
 ```
 
 결과물들이 나온다면 정상적으로 `bucket`에는 접속이 가능한 것입니다.
-`hal config` 명령어가 성공하지 않지만 `bucket`에 접속이 가능하다면 좀 더 많은 트러블 슈팅이 필요할 것 같습니다.
+`hal config` 명령어가 성공하지 않지만 `bucket`에 접속이 가능한 케이스는 아직 보지 못했습니다.
 
 우선 여기까지 해서 `bucket`에 접속이 불가능하다고 판단이 되면, 인터넷이 없는 환경에서 설치하는 방법을 고려해보아야 합니다.
+또는 googleapis.com url로 proxy에서 사이트가 차단되었는지 확인하고, SSL도 해제할 경우 해결될 수도 있습니다.

@@ -3,7 +3,7 @@ title: "Install and Setup Kubectl"
 menuTitle: "Install and Setup Kubectl"
 date:  2020-01-14T02:26:45+09:00
 weight: 2
-draft: false
+draft: true
 tags: [ "kubernetes", "kubectl", "install" ]
 ---
 

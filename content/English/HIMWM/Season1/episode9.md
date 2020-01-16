@@ -2,7 +2,7 @@
 title: "Episode9"
 menuTitle: "Episode9"
 date:  2020-01-15T23:58:54+09:00
-weight: 5
+weight: 9
 draft: false
 ---
 
