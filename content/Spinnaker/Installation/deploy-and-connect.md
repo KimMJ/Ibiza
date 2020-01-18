@@ -46,3 +46,7 @@ kubectl patch svc spin-gate -n spinnaker --type='json' -p '[{"op":"replace","pat
 
 이제 Spinnaker로 접속하여 확인합니다.
 url은 http://<IP>:30100 입니다.
+
+![Spinnaker](/images/Spinnaker/Install/spinnaker.png)
+
+여기까지 했으면 Spinnaker를 Kubernetes에서 사용할 수 있습니다.

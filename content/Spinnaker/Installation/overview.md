@@ -15,7 +15,7 @@ tags: ["install", "spinnaker"]
 
 링크 : https://www.spinnaker.io/guides/developer/getting-set-up/#system-requirements
 
-![시스템 최소 사양](/images/CI-CD/Spinnaker/spinnaker-system-requirements.png)
+![시스템 최소 사양](/images/Spinnaker/spinnaker-system-requirements.png)
 
 * 램 18 GB
 * CPU 4코어
