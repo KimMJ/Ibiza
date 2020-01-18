@@ -7,4 +7,18 @@ draft: false
 tags: [""]
 ---
 
-Lorem Ipsum.
+She seems like she might be into me.
+
+I've moved up in the world.
+
+Oh, well, my word.
+
+Can we swing by the aprtment so I can change?
+
+Ted, Derek stood me up.
+
+What are the odds?
+
+Oh, nuts.
+
+Give it a rest, Ted.
