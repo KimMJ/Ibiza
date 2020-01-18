@@ -1,7 +1,7 @@
 ---
 title: "Ubuntu"
 date: 2020-01-08T01:51:33+09:00
-weight: 10
+weight: 5
 chapter: true
 ---
 

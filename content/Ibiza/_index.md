@@ -1,14 +1,12 @@
 ---
-title: "Category"
-menuTitle: "Computer Science"
-date: 2020-01-08T02:09:58+09:00
-weight: 5
+title: "Ibiza"
+date: 2020-01-08T01:49:46+09:00
+weight: 1
 chapter: true
 ---
 
-### Study
 
-# My Study
+# Ibiza
 
 子曰  
 學而時習之 不亦說乎
