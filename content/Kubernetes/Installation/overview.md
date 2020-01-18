@@ -10,7 +10,7 @@ tags: ["kubernetes", "install", "overview"]
 저의 vm으로 구성한 클러스터를 설명드리고자 합니다.
 
 * Cloud Provider: Kubernetes on-prem (4 VMs)
-  * 1 for master (4GB Mem, 1 CPU)
+  * 1 for master (4GB Mem, 2 CPU)
   * 3 for worker (each 8GM Mem, 4 CPU)
 * Kubernetes 1.17.0
 * Storage Class: Ceph

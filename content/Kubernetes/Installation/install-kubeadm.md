@@ -25,10 +25,10 @@ tags: ["install", "kubeadm"]
    다음과 같이 설정할 수 있습니다.
 
    ```bash
-   sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
-   sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
-   sudo update-alternatives --set arptables /usr/sbin/arptables-legacy
-   sudo update-alternatives --set ebtables /usr/sbin/ebtables-legacy
+    sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
+    sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+    sudo update-alternatives --set arptables /usr/sbin/arptables-legacy
+    sudo update-alternatives --set ebtables /usr/sbin/ebtables-legacy
    ```
 4. 필수 포트 확인
 
@@ -66,15 +66,36 @@ tags: ["install", "kubeadm"]
    `kubectl`은 Kubernetes cluster와 통신하는 툴입니다.
 
    ```bash
-    sudo apt-get update && sudo apt-get install -y apt-transport-https curl
-    curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-    cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
-    deb https://apt.kubernetes.io/ kubernetes-xenial main
-    EOF
-    sudo apt-get update
-    sudo apt-get install -y kubelet kubeadm kubectl
-    sudo apt-mark hold kubelet kubeadm kubectl
+   sudo apt-get update && sudo apt-get install -y apt-transport-https curl
+   curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+   cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
+   deb https://apt.kubernetes.io/ kubernetes-xenial main
+   EOF
+   sudo apt-get update
+   sudo apt-get install -y kubelet kubeadm kubectl
+   sudo apt-mark hold kubelet kubeadm kubectl
    ```
 
    마지막에 `apt-mark`를 통해 `kubelet`, `kubeadm`, `kubectl`의 버전을 고정시켰습니다.
 
+이렇게 `kubelet`, `kubeadm`, `kubectl`을 설치하였으면 마지막으로 swap 영역을 제거할 것입니다.
+Kubernetes는 swap 영역이 없는 것이 필수 항목입니다.
+따라서 다음의 명령어로 swap 영역을 삭제합니다.
+
+```bash
+sudo swapoff -a
+```
+
+이는 현재 세션에서만 동작하고 재부팅시 해제됩니다.
+따라서 `/etc/fstab`을 열고 swap 부분을 주석처리합니다.
+
+```yaml
+#/swapfile                                 none            swap    sw              0       0
+```
+
+#### Reference
+
+https://kubernetes.io/docs/tasks/administer-cluster/network-policy-provider/calico-network-policy/  
+https://kubernetes.io/docs/concepts/cluster-administration/networking/  
+https://docs.projectcalico.org/v3.11/getting-started/kubernetes/  
+https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
