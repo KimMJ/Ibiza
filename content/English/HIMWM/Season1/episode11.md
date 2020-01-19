@@ -4,7 +4,6 @@ menuTitle: "Episode11"
 date:  2020-01-18T19:44:05+09:00
 weight: 11
 draft: false
-tags: [""]
 ---
 
 She seems like she might be into me.

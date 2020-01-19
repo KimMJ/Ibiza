@@ -36,7 +36,7 @@ hal deploy apply
 
 그 후 Spinnaker를 NodePort로 서비스합니다.
 
-```
+```bash
 kubectl patch svc spin-deck -n spinnaker --type='json' -p '[{"op":"replace","path":"/spec/type","value":"NodePort"}]'
 kubectl patch svc spin-gate -n spinnaker --type='json' -p '[{"op":"replace","path":"/spec/type","value":"NodePort"}]'
 
