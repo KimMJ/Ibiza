@@ -1,7 +1,7 @@
 ---
 title: "Installation"
 date: 2020-01-10T01:28:34+09:00
-weight: 5
+weight: 1
 chapter: true
 pre: ""
 draft: false
