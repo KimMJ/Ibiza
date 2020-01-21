@@ -59,6 +59,13 @@ identifier = "hugodoc"
 url = "https://gohugo.io/"
 weight = 20
 
+[[menu.shortcuts]]
+name = "<i class='fas fa-bookmark'></i> Hugo Theme Learn"
+identifier = "hugo-theme-learn"
+url = "https://learn.netlify.com/en/"
+weight = 20
+
+
 # [[menu.shortcuts]]
 # name = "<i class='fas fa-bullhorn'></i> Credits"
 # url = "/credits"

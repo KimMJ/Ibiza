@@ -6,5 +6,3 @@ chapter: true
 ---
 
 # English
-
-To Learn English
