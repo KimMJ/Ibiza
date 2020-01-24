@@ -3,7 +3,7 @@ title: "Tips"
 date: 2020-01-10T01:32:07+09:00
 weight: 10
 chapter: true
-pre: ""
+pre: "<i class='fas fa-angle-right'></i>&nbsp;"
 ---
 
 ### Spinnaker

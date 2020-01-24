@@ -3,7 +3,7 @@ title: "Spinnaker"
 date: 2020-01-10T00:58:33+09:00
 weight: 5
 chapter: true
-pre: ""
+pre: "<i class='fas fa-angle-right'></i>&nbsp;"
 draft: false
 ---
 

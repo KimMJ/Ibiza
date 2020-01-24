@@ -3,7 +3,7 @@ title: "Installation"
 date: 2020-01-10T01:28:34+09:00
 weight: 1
 chapter: true
-pre: ""
+pre: "<i class='fas fa-angle-right'></i>&nbsp;"
 draft: false
 ---
 

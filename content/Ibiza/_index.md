@@ -3,6 +3,7 @@ title: "Ibiza"
 date: 2020-01-08T01:49:46+09:00
 weight: 1
 chapter: true
+pre: "<i class='fas fa-angle-right'></i>&nbsp;"
 ---
 
 
