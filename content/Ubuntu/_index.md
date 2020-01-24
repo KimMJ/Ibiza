@@ -1,7 +1,7 @@
 ---
 title: "Ubuntu"
 date: 2020-01-08T01:51:33+09:00
-weight: 5
+weight: 1
 chapter: true
 pre: "<i class='fas fa-angle-right'></i>&nbsp;"
 ---

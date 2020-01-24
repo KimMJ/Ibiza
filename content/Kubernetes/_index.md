@@ -1,7 +1,7 @@
 ---
 title: "Kubernetes"
 date: 2020-01-12T23:53:35+09:00
-weight: 5
+weight: 1
 pre: "<i class='fas fa-angle-right'></i>&nbsp;"
 chapter: true
 ---
