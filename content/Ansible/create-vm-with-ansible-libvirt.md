@@ -2,6 +2,7 @@
 title: "Create Vm With Ansible Libvirt"
 date: 2020-01-08T01:52:47+09:00
 tags: ["ansible", "libvirt"]
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 Ansible은 어떠한 프로세스를 자동화 할 때 사용할 수 있는 툴입니다.

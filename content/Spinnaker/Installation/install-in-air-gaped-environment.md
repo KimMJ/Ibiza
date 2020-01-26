@@ -5,6 +5,7 @@ date:  2020-01-20T01:16:52+09:00
 weight: 7
 draft: false
 tags: ["install", "spinnaker", "air-gaped"]
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 이번에는 인터넷이 되지 않는 환경에서 어떻게 Spinnaker를 설치하는지에 대해 알아보도록 하겠습니다.

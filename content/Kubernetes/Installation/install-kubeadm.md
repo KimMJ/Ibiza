@@ -5,6 +5,7 @@ date:  2020-01-17T00:38:41+09:00
 weight: 2
 draft: false
 tags: ["install", "kubeadm"]
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 `kubeadm`은 Kubernetes cluster의 설정들을 관리하는 툴입니다.

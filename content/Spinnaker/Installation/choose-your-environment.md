@@ -5,6 +5,7 @@ date:  2020-01-19T00:42:56+09:00
 weight: 4
 draft: false
 tags: ["install", "spinnaker"]
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 Spinnaker를 배포하는 방법에는 3가지가 있습니다.

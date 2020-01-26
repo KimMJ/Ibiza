@@ -5,6 +5,7 @@ date:  2020-01-12T16:28:31+09:00
 weight: 5
 draft: false
 tags: ["font", "hugo"]
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 `Ibiza` 프로젝트를 진행하는데 폰트가 마음에 들지 않았습니다.

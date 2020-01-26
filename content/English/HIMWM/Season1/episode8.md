@@ -4,6 +4,7 @@ menuTitle: "Episode8"
 date:  2020-01-15T01:41:53+09:00
 weight: 8
 draft: false
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 You're making this up.

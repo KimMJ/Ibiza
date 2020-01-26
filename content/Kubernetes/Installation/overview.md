@@ -5,6 +5,7 @@ date:  2020-01-14T01:42:53+09:00
 weight: 1
 draft: false
 tags: ["kubernetes", "install", "overview"]
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 저의 vm으로 구성한 클러스터를 설명드리고자 합니다.

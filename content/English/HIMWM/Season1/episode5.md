@@ -3,6 +3,7 @@ title: "Episode5"
 date: 2020-01-11T00:03:30+09:00
 draft: false
 weight: 5
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 ##### Did I just have a stroke?

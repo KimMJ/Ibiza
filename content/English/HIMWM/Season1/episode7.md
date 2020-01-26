@@ -3,6 +3,7 @@ title: "Episode7"
 date: 2020-01-14T00:53:23+09:00
 draft: false
 weight: 7
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 Yeah, we do that behind you back.

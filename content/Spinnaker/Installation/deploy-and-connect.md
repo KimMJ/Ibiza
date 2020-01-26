@@ -5,6 +5,7 @@ date:  2020-01-19T01:20:12+09:00
 weight: 6
 draft: false
 tags: ["spinnaker", "install"]
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 드디어 마지막 절차입니다.

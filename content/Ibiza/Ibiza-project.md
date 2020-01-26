@@ -3,6 +3,7 @@ title: "Ibiza Project"
 date: 2020-01-08T01:50:49+09:00
 tags: ["blog", "hugo"]
 weight: 3
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 Ibiza Project는 나만의 블로그을 만들기 위한 프로젝트이다.

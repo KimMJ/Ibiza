@@ -4,6 +4,7 @@ menuTitle: "Episode13"
 date:  2020-01-21T00:17:34+09:00
 weight: 13
 draft: false
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 It was her big break.

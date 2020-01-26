@@ -5,6 +5,7 @@ date:  2020-01-21T01:08:00+09:00
 weight: 5
 draft: false
 tags: ["canary", "canary-update", "spinnaker"]
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 ## Spinnaker Canary Analysis

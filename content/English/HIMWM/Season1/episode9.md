@@ -4,6 +4,7 @@ menuTitle: "Episode9"
 date:  2020-01-15T23:58:54+09:00
 weight: 9
 draft: false
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 Okay, Lily, we're putting you on salad duty.

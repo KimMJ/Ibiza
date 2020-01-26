@@ -5,6 +5,7 @@ date:  2020-01-19T00:32:21+09:00
 weight: 3
 draft: false
 tags: ["install", "spinnaker"]
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 Spinnaker를 배포할 환경을 설정해 주어야 합니다.

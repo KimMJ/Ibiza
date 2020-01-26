@@ -5,6 +5,7 @@ date:  2020-01-24T20:56:47+09:00
 weight: 5
 draft: false
 tags: ["hugo", "utterance"]
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 ## 댓글 서비스 선택

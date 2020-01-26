@@ -5,6 +5,7 @@ date:  2020-01-18T22:27:39+09:00
 weight: 5
 draft: false
 tags: ["kubeadm", "instll"]
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 이 문서에서는 Master 노드 한대로 클러스터를 구성하는 방법에 대해 알아보도록 하겠습니다.

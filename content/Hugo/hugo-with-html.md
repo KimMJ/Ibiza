@@ -4,6 +4,7 @@ menuTitle: "hugo with html"
 date: 2020-01-10T02:22:34+09:00
 draft: false
 tags: ["hugo", "html"]
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 `Hugo`는 markdown을 기본적으로 사용하지만 html을 이용해서 좀 더 다양하게 커스터마이징이 가능한 장점도 가지고 있습니다.

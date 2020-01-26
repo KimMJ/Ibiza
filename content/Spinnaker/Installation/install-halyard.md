@@ -5,6 +5,7 @@ date:  2020-01-11T01:41:08+09:00
 weight: 2
 draft: false
 tags: ["spinnaker", "install", "halyard", "proxy"]
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 ## halyard란?

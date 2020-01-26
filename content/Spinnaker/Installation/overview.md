@@ -5,6 +5,7 @@ draft: false
 chapter: false
 weight: 1
 tags: ["install", "spinnaker"]
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 ## Overview of install Spinnaker

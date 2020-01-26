@@ -5,6 +5,7 @@ date:  2020-01-19T00:46:44+09:00
 weight: 5
 draft: false
 tags: ["install", "spinnaker", "minio"]
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 Spinnaker들의 데이터를 저장할 공간입니다.

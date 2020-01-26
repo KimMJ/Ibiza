@@ -3,6 +3,7 @@ title: "Episode6"
 date: 2020-01-13T01:27:04+09:00
 draft: false
 weight: 6
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 Do they rule? They rule.

@@ -4,6 +4,7 @@ menuTitle: "Episode10"
 date:  2020-01-17T00:06:57+09:00
 weight: 10
 draft: false
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 Hey, it's on the hous.
