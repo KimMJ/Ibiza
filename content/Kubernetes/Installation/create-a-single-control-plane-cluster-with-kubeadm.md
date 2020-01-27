@@ -2,7 +2,7 @@
 title: "Create a Single Control Plane Cluster With Kubeadm"
 menuTitle: "Create a Single Control Plane Cluster With Kubeadm"
 date:  2020-01-18T22:27:39+09:00
-weight: 5
+weight: 3
 draft: false
 tags: ["kubeadm", "instll"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"

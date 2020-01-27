@@ -2,6 +2,7 @@
 title: "Unattended Ubuntu"
 date: 2020-01-08T01:52:32+09:00
 tags: ["ubuntu 18.04 server", "preseed.cfg"]
+weight: 10
 pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 

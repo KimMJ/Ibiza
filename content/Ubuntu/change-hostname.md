@@ -2,6 +2,7 @@
 title: "Change Hostname"
 date: 2020-01-14T01:00:02+09:00
 draft: false
+weight: 10
 tags: ["hostname", "ubuntu"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---

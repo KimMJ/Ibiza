@@ -1,7 +1,7 @@
 ---
 title: "CanaryAnalysis"
 date: 2020-01-21T01:41:20+09:00
-weight: 1
+weight: 5
 chapter: true
 pre: "<i class='fas fa-angle-right'></i>&nbsp;"
 ---

@@ -2,6 +2,7 @@
 title: "How to Edit Boot Parameter During Install"
 date: 2020-01-08T01:52:12+09:00
 tags: ["ubuntu", "install", "boot parameter"]
+weight: 10
 pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 

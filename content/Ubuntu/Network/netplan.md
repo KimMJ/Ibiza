@@ -2,6 +2,7 @@
 title: "Netplan"
 date: 2020-01-11T01:12:57+09:00
 draft: true
+weight: 10
 tags: ["ubuntu-18.04", "netplan", "static-ip"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---

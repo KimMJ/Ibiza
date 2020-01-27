@@ -2,7 +2,7 @@
 title: "Tmux"
 menuTitle: "Tmux"
 date:  2020-01-23T21:04:29+09:00
-weight: 5
+weight: 10
 draft: false
 tags: ["tmux", "ubuntu"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"

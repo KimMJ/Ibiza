@@ -2,6 +2,7 @@
 title: "Pipeline Expressions"
 date: 2020-01-10T01:33:32+09:00
 draft: false
+weight: 10
 tags: [ "spinnaker", "pipeline" ]
 pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---

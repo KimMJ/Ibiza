@@ -2,7 +2,7 @@
 title: "Hugo에 Comment 추가하기 (Utterance)"
 menuTitle: "Hugo에 Comment 추가하기 (Utterance)"
 date:  2020-01-24T20:56:47+09:00
-weight: 5
+weight: 10
 draft: false
 tags: ["hugo", "utterance"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"

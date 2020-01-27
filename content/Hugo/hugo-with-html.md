@@ -4,6 +4,7 @@ menuTitle: "hugo with html"
 date: 2020-01-10T02:22:34+09:00
 draft: false
 tags: ["hugo", "html"]
+weight: 10
 pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 

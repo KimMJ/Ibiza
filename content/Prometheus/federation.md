@@ -2,7 +2,7 @@
 title: "Federation"
 menuTitle: "Federation"
 date:  2020-01-21T23:34:44+09:00
-weight: 5
+weight: 10
 draft: false
 tags: ["prometheus", "federation"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"

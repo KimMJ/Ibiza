@@ -2,6 +2,7 @@
 title: "How to Use Sudo Without Password"
 date: 2020-01-08T01:51:54+09:00
 tags: ["sudo", "passwordless", "ubuntu"]
+weight: 10
 pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 

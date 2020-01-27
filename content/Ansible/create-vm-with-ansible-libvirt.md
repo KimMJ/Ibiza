@@ -2,6 +2,7 @@
 title: "Create Vm With Ansible Libvirt"
 date: 2020-01-08T01:52:47+09:00
 tags: ["ansible", "libvirt"]
+weight: 10
 pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
