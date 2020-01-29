@@ -2,7 +2,7 @@
 title: "Episode15"
 menuTitle: "Episode15"
 date:  2020-01-29T01:33:51+09:00
-weight: 10
+weight: 15
 draft: false
 pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---

@@ -160,7 +160,23 @@ ssh TARGET_IP docker load -i ~/path/to/target/SERVICE.tar.gz
 ```
 
 이번에는 dependency와 관련된 이미지를 불러와야 합니다.
-이는 Image Registry를 변경하지 못하므로 `docker save`, `docker load`를 통해서 불러와야 합니다.
+먼저 Image Registry를 변경하기 위해서는 다음과 같이 조치합니다.
+
+1. `~/.hal/default/service-settings/redis.yml`파일을 생성합니다.
+2. 다음과 같이 작성합니다.  
+   ```yaml
+   artifactId: private-docker-registry/repository-name/redis-cluster:v2
+   ```
+
+이 다음에는 마찬가지로 image를 pull하고 이를 private docker registry로 push합니다.
+
+```bash
+docker pull gcr.io/kubernetes-spinnaker/SERVICE:TAG # redis-cluster:v2
+docker tag gcr.io/kubernetes-spinnaker/SERVICE:TAG private-docker-registry/repository-name/SERVICE:TAG
+docker push private-docker-registry/repository-name/SERVICE:TAG
+```
+
+또는 이미지를 `tar`로 묶어서 복사하는 방법도 있습니다.
 
 ```bash
 docker pull gcr.io/kubernetes-spinnaker/SERVICE:TAG
@@ -182,4 +198,5 @@ hal deploy apply
 ```
 
 #### Reference
-https://www.spinnaker.io/guides/operator/custom-boms/
+https://www.spinnaker.io/guides/operator/custom-boms/  
+https://github.com/spinnaker/spinnaker/issues/3967#issuecomment-522306893
