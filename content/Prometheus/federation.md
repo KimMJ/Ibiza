@@ -8,7 +8,7 @@ tags: ["prometheus", "federation"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
-## What is Federation?
+## What is Federation
 
 영어 의미 그대로는 "연합"이라는 뜻입니다.
 즉, Prometheus의 Federation은 여러개의 Prometheus에서 Metric을 가져와
@@ -24,13 +24,12 @@ pre: "<i class='fas fa-minus'></i>&nbsp;"
 저의 상황을 설명해드리고 지나가도록 하겠습니다.
 저는 Kubernetes Cluster가 Dev(Canary), Staging, Production과 비슷하게 3개 있었습니다.
 여기서 Spinnaker를 통해 Dev에 새로운 이미지들을 배포할 것이고,
-이에 대한 Metric을 Canary Analysis를 통해 분석하여 Dev로 배포된 이미지가 
+이에 대한 Metric을 Canary Analysis를 통해 분석하여 Dev로 배포된 이미지가
 이전 Staging의 이미지와 어떻게 다른지 등을 점수화하여 Staging 서버에 배포를 할지 말지 결정하도록 해야하는 상황이었습니다.
 
 이 때, Spinnaker의 설정상 Prometheus를 연동하고 나서 Canary Config를 설정할 때 하나의 Prometheus만 바라보도록 할 수 있었습니다.
 따라서 여러대의 Promethus의 Metric을 비교하기 위해서는 여러대의 Prometheus가 가지고 있는 Metric을 상위개념의 Prometheus가 scrape하도록 해야했습니다.
 어떻게 해야하는지 검색해본 결과 Federation이라는 기능이 있는 것을 알게 되었습니다.
-
 
 ## How to configure Prometheus Federation
 
@@ -96,4 +95,5 @@ job_name은 static_configs[0].targets에 적힌 Prometheus Metric에 어떤 `job
 리스트에 설정한 `job_name`들이 떠있고, `UP`인 상태로 있으면 정상적으로 구성이 된 것입니다.
 
 #### Reference
-https://prometheus.io/docs/prometheus/latest/federation/
+
+<https://prometheus.io/docs/prometheus/latest/federation/>
