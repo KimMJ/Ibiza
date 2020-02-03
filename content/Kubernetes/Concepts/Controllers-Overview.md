@@ -1,8 +1,8 @@
 ---
-title: "Controllers"
-menuTitle: "Controllers"
+title: "Controllers Overview"
+menuTitle: "Controllers Overview"
 date:  2020-01-30T18:26:04+09:00
-weight: 10
+weight: 5
 draft: false
 tags: ["kubernetes", "concepts"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"
