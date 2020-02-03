@@ -61,9 +61,9 @@ container는 VirtualBox처럼 가상화를 하지만, OS까지 가상화하는 �
 어려운 말일수도 있지만 간단하게 말하자면 VirtualBox같은 hypervisor에 의한 가상화보다 훨씬 가벼운 방법으로 가상화를 할 수 있다고 생각하시면 됩니다.
 여기서 가볍다는 의미는 빠르게 생성/삭제할 수 있고 용량도 작다는 의미입니다.
 
-Kubernetes는 이런 Docker와 같은 container engine을 기반으로 동작합니다.
+Kubernetes는 이런 Docker와 같은 container runtime 기반으로 동작합니다.
 그리고 각 container는 어플리케이션 내에서 자신의 역할을 수행하는 것들입니다.
-Docker를 통해 컨테이너를 동작시키는 것처럼, Kubernetes도 컨테이너를 Docker같은 container engine의 힘을 빌려 동작시킵니다.
+Docker를 통해 컨테이너를 동작시키는 것처럼, Kubernetes도 컨테이너를 Docker같은 container runtime의 힘을 빌려 동작시킵니다.
 
 ## Pods
 
