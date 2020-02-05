@@ -1,6 +1,6 @@
 ---
-title: "Getting Started With_Ansible"
-menuTitle: "Getting Started With_Ansible"
+title: "Chapter 1 - Getting Started With Ansible"
+menuTitle: "Getting Started With Ansible"
 date:  2020-02-05T01:41:13+09:00
 weight: 2
 draft: false
@@ -117,7 +117,6 @@ ansible example -a "free -m" -u [username]
 ## Summary
 
 configuration management와 Ansible에 대해 학습하였고, 이를 설치하고 서버에 대해 이야기하며 Ansible을 통해 서버에서 command를 실행시켜보았다.
-
 
 [^1]: 문서화 하지 않고 구성하였기 때문에, 한번 구성하고 나면 동일하게 설정하기 힘든, 눈처럼 녹아버리는 서버
 
