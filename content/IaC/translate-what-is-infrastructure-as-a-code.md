@@ -4,7 +4,7 @@ menuTitle: "[Translate] What Is Infrastructure as a Code"
 date:  2020-02-09T20:06:17+09:00
 weight: 10
 draft: false
-tags: [""]
+tags: ["IaC", "infrastructure-as-code"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
