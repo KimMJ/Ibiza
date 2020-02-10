@@ -2,7 +2,7 @@
 title: "Chapter 2 - Local Infrastructure Development: Ansible and Vagrant"
 menuTitle: "Local Infrastructure Development: Ansible and Vagrant"
 date:  2020-02-05T15:09:00+09:00
-weight: 10
+weight: 3
 draft: false
 tags: ["ansible", "ansible-for-devops"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"
