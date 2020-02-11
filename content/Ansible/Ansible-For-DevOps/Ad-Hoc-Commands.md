@@ -607,3 +607,256 @@ $ ansible multi -m file -a "dest=/tmp/test state=absent"
 (playbooks와 함께.)
 
 ## Run operatioins in the background
+
+몇몇 operation은 약간 시간이 걸린다(수 분에서 몇 시간까지 걸리기도 한다).
+예를 들어, `yum date`나 `apt-get update && apt-get dist-upgrade`를 할 경우, 서버에서 모든 패키지가 업데이트 되기까지 수 분이 걸릴 수 있다.
+
+이러한 상황에서 `Ansible`이 명령어를 asynchronous하게 실행하고 명령어가 끝났을 때 서버에서 결과를 가져오게 할 수 있다.
+하나의 서버만 관리한다면 이는 그렇게 효과적이지는 않겠지만 많은 서버를 관리한다면 모든 서버에서 명령을 굉장히 빠르게 시작하고(특히 `--forks` 값을 늘리면 더욱 더 빨라진다) 이후에 서버에서 최신 상태를 polling할 수 있다.
+
+명령어를 background에서 실행하려면 다음의 옵션을 설정한다.
+
+* `-B <seconds>`: job이 동작할 수 있는 최대 시간 (초)
+* `-P <seconds>`: job 상태를 업데이트하기 위해 polling할 때 대기하는 시간 (초)
+
+### Update servers asynchronously, monitoring progress
+
+`yum -y update`를 모든 서버에서 시작하여 기다려 보자.
+`-P` 옵션을 쓰지 않으면 `Ansible`은 default로 10초마다 polling 한다.
+
+```bash
+$ ansible multi -b -B 3600 -a "yum -y update"
+```
+
+조금 기다리면(VM을 설치한 host에 따라 오래 걸릴수도 있다) 다음과 같은 결과를 볼 수 있다.
+
+```json
+<job 763350539037> finished on 192.168.60.6 => {
+"ansible_job_id": "763350539037",
+"changed": true,
+"cmd": [
+"yum",
+"-y",
+"update"
+],
+"delta": "0:13:13.973892",
+"end": "2021-02-09 04:47:58.259723",
+"finished": 1,
+... [more info and stdout from job] ...
+```
+
+background 작업이 실행되는 동안 `Ansible`의 `async_status` module에 `jid`에 `ansible_job_id`를 넣어 작업 상태를 확인할 수 있다.
+
+```bash
+$ ansible multi -m async_status -a "jid=763350539037"
+```
+
+### Fire-and-forget tasks
+
+또한 장기간 동작하는 유지보수 스크립트를 돌리거나 완료되기까지 오래 걸리는 어떤 작업을 하면, 그 작업을 가만히 기다리고 싶지는 않을 것이다.
+이런 경우에 `-B`를 높게 설정할 수 있다.
+(그렇게 해서 작업이 `Ansible`이 이를 죽이기 전에 끝내도록 할 수 있다.)
+그리고 `-P`를 `0`으로 설정하여 `Ansible`이 명령을 실행하고 잊어버리게 할 수 있다.
+
+```bash
+$ ansible multi -B 3600 -P 0 -a "/path/to/fire-and-forget-script.sh"
+```
+
+`jid`를 통해 상태를 추적할 수 없지만 `fire-and-forget` 작업에는 유용하다.
+
+{{% notice note %}}
+
+원격으로 추적이 불가능한 작업에 대해서는 task의 진행 경과를 log로 남기는 것, 실패 시 알람을 보내는 것은 좋은 방법이다.
+특히, backup을 하는 background 작업이나 business-critical database 유지관리 작업에 유용할 것이다.
+
+{{% /notice %}}
+
+또한 `Ansible`의 playbook을 `async`와 `poll` 파라미터를 정의하여 background에서 asynchrnous로 동작할 수도 있다.
+나중 챕터에서 playbook의 background 동작을 자세히 살펴볼 것이다.
+
+## Check log files
+
+때로 application의 에러를 디버깅 할때 또는 다른 문제를 진단할 때 서버의 log 파일을 확인해야할 필요가 있다.
+일반적인 log 명령(`tail`, `cat`, `grep` 등)은 `ansible` 명령어를 통해 할 수 있다.
+여기엔 몇가지 경고가 있다.
+
+1. 지속적으로 파일을 모니터링하는 `tail -f`같은 것은 `Ansible`을 통해서는 할 수 없다.
+   왜냐면 `Ansible`은 명령이 완료되었을때의 결과만 출력하기 때문이고, file을 following하는 것은 Control+C를 입력하기 전까지는 완료되지 않기 때문이다.
+   언젠가 `async` module이 이 기능을 가질지 모르지만 현재로썬 가능하지 않다.
+2. `Ansible`에서 명령어를 통해 방대한 양의 데이터를 stdout을 통해 리턴받는 것은 좋은 생각이 아니다.
+   수 KB 이상의 파일을 `cat`하려 한다면 각 서버에 개별적으로 로그인 해야한다.
+3. `Ansible`을 통해 실행된 명령어의 결과를 redirect 하거나 filtering 하려면 `Ansible`의 default `command` module이 아닌 `shell` module을 써야 한다.
+   (`-m shell`을 명령어에 추가한다.)
+
+간단한 예제를 통해 각 서버에서 메시지 로그 파일의 끝의 몇 줄을 확인해보자.
+
+```bash
+$ ansible multi -b -a "tail /var/log/messages"
+```
+
+경고 사항에서 언급했듯이 `grep`같은 것으로 메시지 로그를 필터링 하고싶으면 `Ansible`의 default `command` module이 아닌 `shell`을 사용해라.
+
+```bash
+$ ansible multi -b -m shell -a "tail /var/log/messages | grep ansible-command | wc -l"
+
+192.168.60.5 | success | rc=0 >>
+12
+192.168.60.4 | success | rc=0 >>
+12
+192.168.60.6 | success | rc=0 >>
+14
+```
+
+이 명령어는 얼마나 많은 `Ansible` command가 각 서버에서 동작했었는지를 보여준다.
+(숫자는 다를 수 있다)
+
+## Manage cron jobs
+
+cron을 통한 주기적인 작업은 시스템의 crontab을 통해 할 수 있다.
+일반적으로 서버에서의 cron job 설정을 변경하려면 서버에 접속하고 `crontab -e`를 cron job이 있는 계정에서 사용하여 간격과 작업을 입력한다.
+
+`Ansible`은 `cron` module을 통해 cron jobs를 관리할 수 있다.
+매일 4 a.m.에 모든 서버에서 shell script를 실행하고 싶으면 다음과 같은 cron job을 추가하면 된다.
+
+```bash
+$ ansible multi -b -m cron -a "name='daily-cron-all-servers' hour=4 job='/path/to/daily-script.sh'"
+```
+
+`Ansible`은 지정하지 않은 값에 대해서는 `*`이라고 가정할 것이다.
+(유효한 값은 `day`, `hour`, `minute`, `month`, `weekday`이다)
+또한 `special_time=[value]`를 사용하여 `reboot`, `yearly`, `monthly`같은 특정 시간을 설정할 수도 있다.
+job을 특정 유저로 하고싶으면 `user=[user]`를 사용하면 되고 현재 crontab을 백업하고 싶으면 `backup=yes`를 사용하면 된다.
+
+cron job을 제거하려면 어떻게 해야할까?
+간단히 동일한 `cron` 명령어에다가 삭제하고 싶은 cron job 이름을 적고 `state=absent`를 사용하면 된다.
+
+```bash
+$ ansible multi -b -m cron -a "name='daily-cron-all-servers' state=absent"
+```
+
+또한 `Ansible`로 custom crontab 파일을 관리할 수 있다.
+앞선 syntax와 동일하게 사용하지만 cron file의 location을 `cron_file=cron_file_name`으로 설정하면 된다.
+(`cron_file_name`은 `/etc/cron.d`에 위치한 cron file이다)
+
+{{% notice note %}}
+
+`Ansible`은 Ansible-managed crontab 목록을 바로 위에 `#Ansible: daily-cron-all-servers`같은 comment를 남겨서 나타낸다.
+이 crontab은 이대로 남겨두는 것이 제일 좋고, 항상 ad-hoc command 또는 `Ansible`의 `cron` module을 사용하는 playbook으로 관리해야 한다.
+
+{{% /notice %}}
+
+## Deploy a version-controlled application
+
+git checkout으로 업데이트를 하거나 새로운 코드를 서버에서 복사한 뒤 배포를 위해 명령어를 실행시키는 간단한 어플리케이션의 배포에서 `Ansible`의 ad-hoc mode가 도움이 될 수 있다.
+더 복잡한 배포에서 `Ansible` playbook과 rolling update 기능(이후에 더 설명할 것이다)을 사용하여 zero downtime으로 배포를 성공적으로 할 수 있다.
+
+아래의 예시에서 하나 또는 두개의 서버에서 `/opt/myapp` 디렉토리에 있는 간단한 어플리케이션을 실행한다고 가정한다.
+이 디렉토리는 중앙 서버 또는 GitHub같은 곳에서 clone한 git repository이고 어플리케이션의 배포와 업데이트는 clone을 업데이트 하고나서 `/opt/myapp/scripts/update.sh`에 있는 shell script를 실행시켜 진행된다.
+
+먼저, 모든 app 서버에서 application의 새로운 branch인 1.2.4로 git checkout을 하여 업데이트 한다.
+
+```bash
+$ ansible app -b -m git -a "repo=git://example.com/path/to/repo.git dest=/opt/myapp update=yes version=1.2.4"
+```
+
+`Ansible`의 git module은 branch, tag 또는 `version` parameter와 함께 특정한 commit을 지정할 수 있도록 한다.
+(이 경우 우리는 1.2.4 tag로 checkout하지만 `prod`같은 brach 이름으로 명령어를 실행하고자 한다면 `Ansible`은 이를 해줄 것이다)
+`Ansible`이 강제로 checked-out copy를 업데이트하도록 하려면 `update=yes`를 추가하면 된다.
+`repo`와 `dest` 옵션은 의미가 명확하다.
+
+그 다음 application의 `update.sh` shell script를 실행시킨다.
+
+```bash
+$ ansible app -b -a "/opt/myapp/update.sh"
+```
+
+ad-hoc command는 (위에서 본 예제와 같은)간단한 배포에 적합하지만 더 복잡한 어플리케이션 또는 복잡한 인프라를 필요로 할 경우 사용할 수 있는 `Ansible`의 더 강력하고 유연한 어플리케이션 배포 기능은 이 책의 뒷부분에 설명되어있다.
+특히 `Rolling Updates` 섹션을 보아라.
+
+## Ansible's SSH connection history
+
+`Ansible`의 가장 좋은 기능 중 하나는 추가적인 어플리케이션이나 daemon을 관리하는 서버에서 실행시키지 않아도 된다는 것이다.
+대신 서버와 적절한 프로토콜로 통신을 하며 `Ansible`은 거의 모든 Linux 서버에서 동작하는 일반적인 관리를 위해 표준화되고 안전한 SSH 연결을 사용한다.
+
+안정적이고 빠르고 안전한 SSH 연결은 `Ansible` 통신 기능의 심장과도 같기 때문에 `Ansible`의 SSH 구현은 지난 몇년간 지속적으로 개선되어왔고 지금도 계속되고있다.
+
+`Ansible`의 SSH 연결 방법의 일반적인 것 중 하나는 `Ansible`이 연결을 통해 play나 command로 정의한 하나 또는 몇가지 파일을 원격 서버로 전송하고, play/command를 실행하고, 전송된 파일을 삭제하고, 결과를 리포트하는 것이다.
+이런 이벤트 sequence는 나중의 `Ansible`에서는 변경될 수 있고 더 간단하고 직접적으로 변할 수 있다.
+(아래 `Ansible` 1.5를 보아라)
+하지만 빠르고, 안정적이고 안전한 SSH 연결은 `Ansible`에서 무엇보다도 중요하다.
+
+### Paramiko
+
+먼저 `Ansible`은 `paramiko`(Python에서 SSH2 implementaion을 한 open source)만을 사용한다.
+하지만 단일 언어(Python)에 대한 단일 라이브러리로 `paramiko`의 개발은 OpenSSH의 개발을 따라잡지 못하고 있다.
+(거의 모든 곳에서 사용되는 SSH의 표준 구현이다)
+그리고 OpenSSH보다 퍼포먼스와 보안이 약간은 떨어진다.
+최소한 작성자의 관점에서는 말이다.
+
+`Ansible`이 계속해서 `paramiko`를 지원하며, 그리고 이를 (OpenSSH 5.6 또는 이후버전에서 option으로 지원하는)ControlPersist에서는 지원하지 않는 system의 default로 선택하며(RHEL 5/6 처럼)
+(ControlPersist는 서버의 SSH config에서 설정된 `ControlPersist` timeout이 될때까지 SSH 연결이 유지되도록 한다)
+
+### OpenSSH (default)
+
+`Ansible` 1.3부터 `Ansible`은 default로 `OpenSSH` 연결을 사용하여 ControlPersist를 지원하며 서버에 연결하도록 하였다.
+`Ansible`은 이 기능을 0.5 버전부터 가지고 있었지만 1.3부터 default가 되었다.
+
+대부분의 local SSH configuration parameters(hosts, key files, 등)은 사용되지만 22 포트(default SSH Port)가 아닌 포트로 연결을 해야한다면 inventory file(`ansible_ssh_port` 옵션)에 포트를 지정하거나 `ansible` command를 이용해야 한다.
+
+`OpenSSH`는 `paramiko`보다 빠르고 더 믿을 수 있다.
+하지만 `Ansible`을 빠르게 하는 방법은 여전히 더 존재한다.
+
+### Accelerated Mode
+
+ad-hoc command가 그렇게 도움이 되지 않더라도 `Ansible`의 Accelerated mode는 playbook에 보다 더 좋은 퍼포먼스를 보여준다.
+반복적으로 SSH를 통해 연결하는 것 대신, `Ansible`은 SSH를 처음에 연결하고, 처음 연결에 사용한 AES key를 사용하여 나머지 명령어와 통신하고 분리된 포트를 통해 전송한다(5099가 default지만 설정 가능하다).
+
+accelerated mode를 위해 필요한 추가적인 패키지는 `python-keyczar` 뿐이고 `OpenSSH`/`Paramiko` mode에서 사용가능한 대부분의 것은 `sudo`를 사용할 때 빼고 Accerlerated mode에서 사용 가능하다.
+
+* sudoers 파일에 requiretty가 disabled 되어있다.
+  (여기서 주석을 해제하거나 각 유저에 대해 `Defaults:username !requiretty`로 줄을 변경한다)
+* sudoers 파일에서 `NOPASSWD` 설정을 하여 sudo password를 disable한다.
+
+Accelerated mode는 `OpenSSH`에 비해 2~4배 더 빠른 성능(특히 파일 전송같은 것들에서)을 보여주고 playbook에서 `accelerate: true`를 설정하여 활성화 할 수 있다.
+
+```yaml
+---
+- hosts: all
+  accelerate: true
+```
+
+말할 것도 없이 accelerated mode를 사용하면 통신을 할 때 사용할 포트가 방화벽에서 뚫려있어야 한다.
+(5099 port가 default이며 `accelerate` 뒤에 이은 `accelerate_port` 옵션을 통해 지정한 포트 어느것도 될 수 있다.)
+
+accelerate mode는 `Ansible`의 통신을 가속화하는 비슷한 방법이지만 `ZeroMQ`가 controlled 서버에 설치(`Ansible`의 simple no-dependency와 no-daemon philosophy에 위배된다)되어야 하고 sudo command는 작동하지 않는, 지금은 deprecated된 `Fireball` mode에서 영감을 얻었다.
+
+### Faster OpenSSH in Ansible 1.5+
+
+`Ansible` 1.5부터 `Ansible`의 default `OpenSSH` 구현에 매우 큰 개선이 있었다.
+
+파일을 복사하는 대신 이를 원격 서버에서 실행하게 하고 이들을 지우는 새로운 OpenSSH 전송 방법은 SSH 통신을 통해 대부분의 `Ansible` module에 대한 명령어를 전송하고 실행할 것이다.
+
+이 연결 방법은 `Ansible` 1.5+에서만 사용할 수 있고 `pipelining=True`를 `Ansible` configuration file(나중에 좀 더 자세히 설명할, `ansible.cfg`)의 `[ssh_connection]` 섹션 아래에 추가하여 활성화 할 수 있다.
+
+{{% notice note %}}
+
+`pipelining=True` 설정 옵션은 `/etc/sudoers`의 `Defaults requiretty` 옵션을 제거했거나 주석처리 했다면 도움되지 않을 것이다.
+대부분의 OS에서 이는 default configuration으로 설정되어 있지만, 이 세팅을 다시 한번 확인하여 fastest connection이 가능할지 확인해라.
+
+{{% /notice %}}
+
+{{% notice note %}}
+
+Mac OS X, Ubuntu, Cygwin을 사용한 Windows나 다른 대부분의 OS의 최신 버전으로 `ansible`과 `ansible-playbook`을 실행하는 host를 사용한다면, `OpenSSH` 5.6 이후 버전을 실행해야 `Ansible`의 SSH connection 세팅과 함께 사용되는 `ControlPersist` setting과 잘 동작한다.  
+만일 `Ansible`이 실행되고 있는 호스트가 RHEL이나 CentOS를 가지고 있다면 `OpenSSH` 버전을 최슨으로 업데이트 하여 빠르고/지속 가능한 연결 방법을 사용할 수 있다.
+`OpenSSH` 5.6버전 이후는 전부 다 잘 작동한다.
+이후의 버전들을 설치하려면 소스코드로부터 컴파일하거나 CentALT같은 다른 레파지토리를 사용하고 `yum update openssh`를 하면 된다.
+
+{{% /notice %}}
+
+## Summary
+
+이 챕터에서 우리는 어떻게 local workstation에 test 목적을 위한 multi-server infrastructure를 `Vagrant`를 통해 구축하는지, 이를 설정하고 모니터링하고 인프라를 각 서버에 접속하지 않고도 관리하는 방법에 대해 배웠다.
+또한 어떻게 `Ansible`이 원격 서버에 접속하는지에 대해 배웠고 어떻게 `ansible` 명령어가 많은 서버의 작업들을 빠르게 병렬적으로 수행할 수 있는지 하나씩 보았다.
+
+이제 우리는 `Ansible`의 basic과 익숙해지게 되었고, 더 효과적으로 우리만의 infrastructure를 관리할 수 있게 되었다.
