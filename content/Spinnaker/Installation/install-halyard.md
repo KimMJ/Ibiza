@@ -52,33 +52,35 @@ adduser spinnaker
 adduser spinnaker sudo
 ```
 
-1. 최신 버전의 `halyard 다운로드`
+#### 최신 버전의 `halyard 다운로드`
 
-	Debian/Ubuntu:
-	
-	```bash
-	curl -O https://raw.githubusercontent.com/spinnaker/halyard/master/install/debian/InstallHalyard.sh
-	```
+Debian/Ubuntu:
 
-	macOS:
-	
-	```bash
-	curl -O https://raw.githubusercontent.com/spinnaker/halyard/master/install/macos/InstallHalyard.sh
-	```
+```bash
+curl -O https://raw.githubusercontent.com/spinnaker/halyard/master/install/debian/InstallHalyard.sh
+```
 
-2. 설치
-	
-	```bash
-	sudo bash InstallHalyard.sh
-	```
+macOS:
 
-3. 확인
-	
-	```bash
-	hal -v
-	```
-	
-4. `. ~/.bashrc`를 실행하여 bash completion 활성화
+```bash
+curl -O https://raw.githubusercontent.com/spinnaker/halyard/master/install/macos/InstallHalyard.sh
+```
+
+#### 설치
+  
+```bash
+sudo bash InstallHalyard.sh
+```
+
+#### 확인
+  
+```bash
+hal -v
+```
+
+#### 추가사항
+
+`. ~/.bashrc`를 실행하여 bash completion 활성화
 
 여기서 proxy 환경이라면 `halyard`의 jvm에 proxy 옵션을 추가해주어야 합니다.
 
@@ -115,8 +117,8 @@ docker run -p 8084:8084 -p 9000:9000 \
 docker run -p 8084:8084 -p 9000:9000 \
     --name halyard --rm \
     -v ~/.hal:/home/spinnaker/.hal \
-		-v ~/.kube:/home/spinnaker/.kube \
-		-e KUBECONFIG=/home/spinnaker/.kube/config
+    -v ~/.kube:/home/spinnaker/.kube \
+    -e KUBECONFIG=/home/spinnaker/.kube/config
     -it \
     gcr.io/spinnaker-marketplace/halyard:stable
 ```
@@ -132,7 +134,7 @@ docker run -p 8084:8084 -p 9000:9000 \
     -v ~/.hal:/home/spinnaker/.hal \
     -v ~/.kube:/home/spinnaker/.kube \
     -e http_proxy=http://<proxy_host>:<proxy_port> \
-    -e https_proxy=https://<proxy_host>:<proxy_port> \    
+    -e https_proxy=https://<proxy_host>:<proxy_port> \
     -e JAVA_OPTS="-Dhttps.proxyHost=<proxy_host> -Dhttps.proxyPort=<proxy_port>" \
     -e KUBECONFIG=/home/spinnaker/.kube/config \
     gcr.io/spinnaker-marketplace/halyard:stable
