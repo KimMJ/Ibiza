@@ -107,7 +107,7 @@ hal config
 docker run -p 8084:8084 -p 9000:9000 \
     --name halyard --rm \
     -v ~/.hal:/home/spinnaker/.hal \
-    -it \
+    -d \
     gcr.io/spinnaker-marketplace/halyard:stable
 ```
 
@@ -118,8 +118,8 @@ docker run -p 8084:8084 -p 9000:9000 \
     --name halyard --rm \
     -v ~/.hal:/home/spinnaker/.hal \
     -v ~/.kube:/home/spinnaker/.kube \
-    -e KUBECONFIG=/home/spinnaker/.kube/config
-    -it \
+    -e KUBECONFIG=/home/spinnaker/.kube/config \
+    -d \
     gcr.io/spinnaker-marketplace/halyard:stable
 ```
 
@@ -130,7 +130,7 @@ docker run -p 8084:8084 -p 9000:9000 \
 
 ```bash
 docker run -p 8084:8084 -p 9000:9000 \
-    --name halyard -d \
+    --name halyard --rm -d \
     -v ~/.hal:/home/spinnaker/.hal \
     -v ~/.kube:/home/spinnaker/.kube \
     -e http_proxy=http://<proxy_host>:<proxy_port> \

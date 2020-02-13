@@ -68,7 +68,7 @@ MINIO_SECRET_KEY=minio123
 
 echo $MINIO_SECRET_KEY | hal config storage s3 edit --endpoint $ENDPOINT \
     --access-key-id $MINIO_ACCESS_KEY \
-    --secret-access-key 
+    --secret-access-key
 
 hal config storage edit --type s3
 ```
