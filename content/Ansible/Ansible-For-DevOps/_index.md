@@ -10,4 +10,4 @@ pre: "<i class='fas fa-angle-right'></i>&nbsp;"
 
 # Ansible For DevOps
 
-`Ansible For DevOps`라는 책에 대해 공부하고 정리한 것들입니다.
+`Ansible For DevOps`라는 책을 번역한 것입니다.

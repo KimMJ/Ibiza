@@ -64,6 +64,17 @@ tar xvf packer.tar.gz
 hal config version edit --version local:1.17.4
 ```
 
+그리고 `halyard`가 gcs를 바라보지 않도록 설정합니다.
+
+```yaml
+# /opt/spinnaker/config/halyard-local.yml
+spinnaker:
+  config:
+    input:
+      gcs:
+        enabled: false
+```
+
 그러고 난 뒤, 각 서비스들의 BOM도 로컬을 바라보게 설정해야 합니다.
 아까 위에서 1.17.4 버전을 사용한다고 했으니, 해당 yaml파일을 열고 `local:` 접두사를 추가합니다.
 
