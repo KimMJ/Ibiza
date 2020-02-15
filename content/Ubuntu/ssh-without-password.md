@@ -1,5 +1,5 @@
 ---
-title: "Password 없이 ssh 접속하기"
+title: "password 없이 ssh 접속하기"
 date:  2020-02-15T15:48:57+09:00
 weight: 10
 draft: false
