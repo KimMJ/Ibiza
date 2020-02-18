@@ -370,7 +370,7 @@ Django는 official CentOS yum repository에 없지만 우리는 Python의 easy_i
 ```bash
 $ ansible app -b -m yum -a "name=MySQL-python state=present"
 $ ansible app -b -m yum -a "name=python3-setuptools state=present"
-$ ansible app -m pip -a "name=django executable=pip3"
+$ ansible app -b -m pip -a "name=django executable=pip3"
 ```
 
 우리는 `easy_install`을 통해 설치한 django를 `pip`를 통해서도 설치할 수 있다.
