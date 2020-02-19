@@ -528,3 +528,55 @@ $ ansible-playbook playbook.yml --extra-vars="node_apps_location=/usr/local/opt/
 전체 Node.js app server playbook은 이 책의 code repository인 <https://github.com/geerlingguy/ansible-for-devops>의 `nodejs` 디렉토리에서 확인할 수 있다.
 
 ## Real-world playbook: Ubuntu LAMP server with Drupal
+
+이젠 Ansible `playbook`과 그것을 정의하는 YAML 문법에 친숙해져야 한다.
+여기서 대부분의 예시는 CentOS, RHEL, Fedora 서버를 사용한다고 가정한다.
+Ansible은 다른 Linux나 BSD같은 시스템에서도 잘 동작한다.
+다음의 예시에서 Drupal website를 실행하기 위해 우리는 전통적인 LAMP(Linux, Apache, MySQL, PHP)를 Ubuntu 12.04에 셋업할 것이다.
+
+```chart
++-----------------------------------------------------------+
+|                                                           |
+|                  Drupal LAMP Server / VM                  |
+|                                                           |
++-----------------------------------------------------------+
+|                                                           |
+| +-------------------------------------------------------+ |
+| |                                                       | |
+| |                                                       | |
+| |                 Drupal (application)                  | |
+| |                                                       | |
+| |                                                       | |
+| +-------------------------------------------------------+ |
+|                                                           |
+| +--------------------------+ +--------------------------+ |
+| |                          | |                          | |
+| |       PHP 5.4.x          | |                          | |
+| |                          | |        Mysql 5.6.x       | |
+| |       Apache 2.2.x       | |                          | |
+| |                          | |                          | |
+| +--------------------------+ +--------------------------+ |
+|                                                           |
+| +-------------------------------------------------------+ |
+| |                                                       | |
+| |                      Ubuntu 12.04                     | |
+| |                                                       | |
+| |                        (Linux)                        | |
+| |                                                       | |
+| +-------------------------------------------------------+ |
+|                                                           |
++-----------------------------------------------------------+
+```
+
+## Include a variables file, and discover `pre_tasks` and `handlers`
+
+이 playbook에서 우리는 좀 더 playbook을 효과적으로 구성하는 것부터 시작할 것이다.
+command line을 통해 전달해주어야 할 필수 variable들을 정의하는 대신, 분리된 `vars.yml`파일에서 Ansible이 사용할 variables를 따로 관리하여 playbook을 실행하도록 하자.
+
+```yaml
+- hosts: all
+
+  vars_files:
+  - vars.yml
+```
+
