@@ -580,3 +580,153 @@ command line을 통해 전달해주어야 할 필수 variable들을 정의하는
   - vars.yml
 ```
 
+하나 이상의 variable file을 가지면 main playbook file을 깨끗하게 해줄 것이고 모든 configurable variable을 한곳에 정리할 수 있다.
+이 때, 우리는 어떤 variable도 추가하지 않아도 된다.
+우리는 `vars.yml`을 나중에 정의할 것이다.
+지금은 빈 파일을 생성하고 playbook의 다음 section인 `pre_task`를 진행해보자.
+
+```yaml
+  pre_tasks:
+  - name: Update apt cache if needed.
+    apt: update_cache=yes cache_valid_time=3600
+```
+
+Ansible은 main으로 실행할 task들이 실행되기 전과 이후에 `pre_tasks`와 `post_tasks`로 특정한 task를 실행할 수 있다.
+이 경우에 우리는 playbook의 나머지가 실행되기 전에 apt cache가 업데이트 되어 우리의 서버에서 최신 버전의 패키지가 깔려있는지 확인을 하고 싶다.
+우리는 Ansible의 `apt` module을 사용하여 지난 update 이후 3600초(1시간)보다 오래 경과했을 경우 cache를 업데이트 하라고 지시한다.
+
+그런식으로 한 다음에 우리는 `handlers:`라는 새로운 section을 추가할 것이다.
+
+```yaml
+  handlers:
+  - name: restart apache
+    service: name=apache2 state=restarted
+```
+
+`handlers`는 그 그룹의 어느 task에서든지 `notify` 옵션을 추가하여 task 그룹 가장 마지막에 실행되는 특별한 종류의 task이다.
+handler는 task들 중 하나가 handler에게 server에 변경사항을 만들 것(그리고 실패하지 않았음)이란걸 알릴 때만 호출되고 task 그룹의 가장 마지막에만 알림을 받는다.
+
+이 hanlder를 호출하려면 `notify: restart apache` 옵션을 나머지 play에서 정의하면 된다.
+우리는 이 handler를 정의하여 아래에 설명하듯 `apache2` service를 configuration이 변경되고 나서 재시작할 수 있도록 한다.
+
+{{% notice notes %}}
+
+variables처럼 handler와 task는 별도의 파일에 존재할 수 있고 playbook 안에서 이를 자그마하게 할 수 있다.
+(이에 대해서는 챕터 6에서 다루어 볼 것이다.)
+하지만 간결하게 하기 위해 이 챕터에서의 예시들은 하나의 playbook file에 모두 보여진다.
+우리는 다른 playbook organization 방법에 대해 나중에 토론해 볼 것이다.
+
+{{% /notice %}}
+
+### Basic LAMP server setup
+
+LAMP stack에 의존성을 가지는 application server를 구축하는 첫 단계는 실제 LAMP 쪽을 빌드하는 것이다.
+이는 간단한 프로세스이지만 개별 서버에서 추가적인 약간의 작업이 필요하다.
+Apache, MySQL, PHP를 설치하고 싶지만 우리는 또한 다른 dependency도 필요하고 또한 extra apt repository에서만 사용할 수 있는 PHP의 특정 버전(5.5) 버전이 필요하다.
+
+```yaml
+  tasks:
+  - name: Get Software for apt repository management.
+    apt: name={{ item }} state=installed
+    with_items:
+    - python-apt
+    - python-pycurl
+  - name: add ondrej repository for later versions of PHP.
+    apt_repository: repo='ppa:ondrej/php5' update_cache=yes
+
+  - name: "Install Apache, MySQL, PHP, and other dependencies."
+    apt: name={{ item }} state=installed
+    with_items:
+    - git
+    - curl
+    - sendmail
+    - apache2
+    - php5
+    - php5-common
+    - php5-mysql
+    - php5-cli
+    - php5-curl
+    - php5-gd
+    - php5-dev
+    - php5-mcrypt
+    - php-apc
+    - php-pear
+    - python-mysqldb
+    - mysql-server
+  - name: Disable the firewall (since this is for local dev only).
+    service: name=ufw state=stopped
+
+  - name: "Start Apache, MySQL, and PHP."
+    service: "name={{ item }} state=started enabled=yes"
+    with_items:
+    - apache2
+    - mysql
+```
+
+이 playbook에서 우리는 각각 이름지어진 play에 간단한 prefix를 추가하기로 경정하였고 따라서 playbook의 progress가 실행될 때 더 쉽게 따라갈 수 있게 되었다.
+일반적인 LAMP setup으로 시작할 것이다.
+
+1. 두개의 helper library를 설치할 것이다.
+   이것들은 python이 apt을 더 정확하게 관리할 수 있도록 한다.
+   (`python-apt`, `python-pycurl`은 `apt-repository` module이 동작하는 데 필요하다)
+2. Ubuntu 12.04의 default apt repository가 PHP 5.4.x(또는 이후 버전)를 포함하지 않기 때문에 PHP 5.4.25(이글을 작성하는 시점에서)과 나머지 PHP package들을 포함하는 ondrej의 `PHP5-oldstable` repository를 설치한다.
+3. 우리의 LAMP server에 필요한 모든 package를 설치한다(Drupal을 실행하기 위한 php5 extension들도 설치한다).
+4. 테스트 목적을 위해 firewall을 모두 disable한다.
+   production server나 어떤 server가 인터넷에 노출되어 있으면 22, 80, 443 또는 필요한 port만 허용하는 엄격한 firewall을 사용해야 한다.
+5. 모든 필요한 service를 시작하고 system boot 시 enable되도록 해야한다.
+
+### Configure Apache
+
+다음 단계는 Apache가 Drupal과 잘 동작할 수 있도록 설정하는 것이다.
+기본적으로 Ubuntu 12.04의 Apache는 mod_rewrite enabled가 되어있지 않다.
+이를 해결하기 위해 우리는 `sudo a2enmod rewrite` 명령어를 입력해야 하지만 Ansible은 `apache2_module` module로 이를 간단하게 할 수 있다.
+
+추가적으로 VirtualHost entry를 추가하여 Apache에게 사이트 문서의 root가 어딘지 알려주고 사이트의 다른 옵션들을 알려주어야 한다.
+
+```yaml
+  - name: Enable Apache rewrite module (required for Drupal).
+    apache2_module: name=rewrite state=present
+    notify: restart apache
+
+  - name: Add Apache virtualhost for Drupal 8 development
+    template:
+      src: "templates/drupal.dev.conf.j2"
+      dest: "/etc/apache2/sites-available/{{ domain }}.dev.conf"
+      owner: root
+      group: root
+      mode: 0644
+    notify: restart apache
+
+  - name: Symlink Drupal virtualhost to sites-enabled.
+    file:
+      src: "/etc/apache2/sites-available/{{ domain }}.dev.conf"
+      dest: "/etc/apache2/sites-enabled/{{ domain }}.dev.conf"
+      state: link
+    notify: restart apache
+
+  - name: Remove default virtualhost file.
+    file:
+      path: "/etc/apache2/sites-enabled/000-default"
+      state: absent
+    notify: restart apache
+```
+
+첫번째 명령어는 모든 필요한 Apache module들을 `/etc/apache2/mods-available`에서 `/etc/apache2/mods-enabled`로 symlink를 걸어 enable하는 것이다.
+
+두번째 명령어는 우리가 templates 폴더 안에서 정의한 Jinja2 template을 Apache의 `sites-available` 폴더로 올바른 owner와 permission을 가지고 복사하는 것이다.
+추가적으로 새로운 VirtualHost로 복사하는 것은 Apache가 변경사항을 가져오기 위해 재시작되어야 한다는 뜻이므로 `restart apache` handler에게 `notify`를 한다.
+
+Jinja2 template(filename 마지막에 `.j2`라고 적혀있다)인 `drupal.dev.conf.j2`를 확인해보자.
+
+```j2
+<VirtualHost *:80>
+  ServerAdmin webmaster@localhost
+  ServerName {{ domain }}.dev
+  ServerAlias www.{{ domain }}.dev
+  DocumentRoot {{ drupal_core_path }}
+  <Directory "{{ drupal_core_path }}">
+    Options FollowSymLinks Indexes
+    AllowOverride All
+  </Directory>
+</VirtualHost>
+```
