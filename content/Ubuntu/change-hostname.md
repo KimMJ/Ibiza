@@ -1,5 +1,5 @@
 ---
-title: "Change Hostname"
+title: "Hostname 변경하기"
 date: 2020-01-14T01:00:02+09:00
 draft: false
 weight: 10
