@@ -3,7 +3,7 @@ title: "pipe를 사용한 명령어를 watch로 확인하기"
 date:  2020-02-23T16:07:38+09:00
 weight: 10
 draft: false
-tags: [""]
+tags: ["watch", "pipe"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 

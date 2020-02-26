@@ -3,7 +3,7 @@ title: "열려있는 포트 확인하기"
 date:  2020-02-24T13:38:04+09:00
 weight: 10
 draft: false
-tags: [""]
+tags: ["linux", "port", "network"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
