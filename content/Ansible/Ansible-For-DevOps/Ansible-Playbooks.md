@@ -730,3 +730,497 @@ Jinja2 template(filename 마지막에 `.j2`라고 적혀있다)인 `drupal.dev.c
   </Directory>
 </VirtualHost>
 ```
+
+이는 Apache VirtualHost definition의 거의 표준 형식이지만 우리는 거기에 Jinja2 template 변수들을 섞어넣었다.
+Jinja2 template에서의 변수를 프린트하는 문법은 Ansible playbook의 문법과 동일하다. - 두개의 bracket(`{`)으로 변수의 이름을 감싼다. (`{{ varialbe }}`)
+
+우리는 세가지 variable(`drupal_core_version`, `drupal_core_path`, `domain`)이 필요하여 이들을 전에 생성했던 `vars.yml` 파일에 추가해 주었다.
+
+```yaml
+# The core version you want to use (e.g. 6.x, 7.x, 8.0.x).
+drupal_core_version: "8.0.x"
+
+# The path where Drupal will be downloaded and installed.
+drupal_core_path: "/var/www/drupal-{{ drupal_core_version }}-dev"
+
+# The resulting domain will be [domain].dev (with .dev appended).
+domain: "drupaltest"
+```
+
+이제 Ansible이 이 template을 위치시키게 될 play에 도달했을 때 Jinja2 template은 variable name을 value `8.0.x`와 `drupaltest`(또는 원하는 어떤 value)로 치환할 것이다.
+
+마지막 두 task는(line 12-19) 방금 생성한 VirtualHost를 enable하고 더이상 사용하지 않는 default VirtualHost definition을 삭제할 것이다.
+
+여기서부터 우리는 서버를 시작할 수 있지만 Apache는 우리가 정의한 VirtualHost가 아직 존재하지 않기 때문에(`{{ drupal_core_path }}`에 디렉토리가 아직 없다) 에러를 던질 것이다.
+이는 `notify`를 사용하는 것이 중요한 이유이다. - 이 세 step이 끝나고 Apache를 재시작하기 위해 play를 추가하는 대신에(처음 playbook을 실행할 때는 에러가 발생할 것이다) notify는 task의 main group의 다른 모든 단계가 끝날때까지 기다린 뒤(server 세팅이 끝나기까지 시간을 준다) Apache를 재시작한다.
+
+### Configure PHP with lineinfile
+
+file management와 ad-hoc task execution에 관해 설명할 때 우리는 book에서의 `lineinfile`에 대해 짧게 언급했었다.
+PHP의 configuration을 수정하는 것은 `lineinfile`의 simplicity와 usefulness를 설명하기에 매우 좋은 방법이다.
+
+```yaml
+  - name: Enable upload progress via APC.
+    lineinfile:
+      dest: "/etc/php5/apache2/conf.d/20-apcu.ini"
+      regexp: "^apc.rfc1867"
+      line: "apc.rfc1867 = 1"
+      state: present
+    notify: restart apache
+```
+
+Ansible의 `lineinfile` module은 간단한 task를 한다.
+특정 text line이 파일에서 존재하는지(또는 존재하지 않는지) 확인한다.
+
+이 예시에서 우리는 APC의 `rfc1867` option을 enable하여 Drupal이 APC의 파일 업로드 progress tracking을 사용하고 싶다.
+(이걸 할수 있는 더 좋은 방법들이 있지만 우리의 간단한 서버를 위해선 이걸로도 충분하다)
+
+먼저 `dest` parameter를 통해 `lineinfile`에게 파일의 위치를 알려주어야 한다.
+그 다음 regular expression(Python-style)로 line이 어떻게 되어야 하는지를 정의한다.
+(이 경우 line은 `apc.rfc1867`로 시작해야 한다. - 우리는 period를 escape해야 하는데 이는 regular expression에서 special character이기 때문이다)
+그 다음 `lineinfile`에게 정확히 어떻게 resulting line이 되어야 하는지를 알려준다.
+마지막으로 이 line이 present해야 한다고 명시적으로 언급한다.
+(`state` parameter를 통해)
+
+Ansible은 regular expression을 가지고 매칭되는 line이 있는지 본다.
+있다면 Ansible은 line이 `line` parameter와 매칭되는지 확인한다.
+매칭되지 않는다면 Ansible은 `line` parameter에 정의된 line을 추가한다.
+Ansible은 추가하거나 line을 match `line`으로 변경해야하는 상황에서만 변경점을 report한다.
+
+### Configure MySQL
+
+다음 단계는 MySQL의 default test database를 삭제하고 Drupal installation에 사용할 (이전에 정의한 domain의 이름을 가진)database를 생성하는 것이다.
+
+```yaml
+  - name: Remove the MySQL test database.
+    mysql_db: db=test state=absent
+  
+  - name: Create a database for Drupal.
+    mysql_db: "db={{ domain }} state=present"
+```
+
+MySQL은 default로 `test`라 이름지어진 database를 설치하고 MySQL에 포함된 `mysql_secure_installation`의 일부 데이터베이스를 삭제하는 것을 권장한다.
+MySQL을 configure하는 첫 단계는 이 database를 삭제하는 것이다.
+그 다음 우리는 database를 `{{ domain }}`이란 이름으로 생성할 것이다 - database는 우리가 Drupal site에 사용할 domain가 동일하다.
+
+{{% notice note %}}
+
+Ansible은 많은 데이터베이스를 `out-of-the-box`로 제공하여 기본으로 이용할 수 있다.
+(이 글을 작성하는 시점에는 `MongoDB`, `MySQL`, `PostgreSQL`, `Redis`, `Riak`가 있다)
+MySQL의 경우 Ansible은 MySQLdb Python package(python-mysqldb)를 사용하여 database server의 connection을 관리하고 default root 계정 credentials를 사용한다고 가정한다.
+(`root`가 username이고 passowrd는 없다)
+이런 default를 그대로 두는 것은 명백히 잘못된 생각이다.
+production server에서 첫번째 단계중 하나는 root account의 password를 바꾸고 root account를 localhost로만 제한하고 불필요한 user를 제거하는 것이어야 한다.  
+만약 다른 credentials를 사용한다면 Ansible이 MySQL에 접속할 때 Ansible playbook이나 variable files에 password를 기록하는 방법이 아닌 접속시 사용할 `.my.cnf` 파일을 remote user의 home directory에 추가할 수 있다.
+아니면 Ansible playbook을 실행할 때 MySQL의 username과 password를 입력하게 할 수 있다.
+prompts를 사용하는 이 옵션은 이 책의 뒷부분에서 다룰 것이다.
+
+{{% /notice %}}
+
+### Install Composer and Drush
+
+Drupal은 Drush의 형태로 commandl-line을 가지고 있다.
+Drush는 Drupal과는 별개로 개발되고 있고 Drupal을 관리할 때 사용할 수 있는 CLI 명령어를 모두 제공한다.
+Drush는 대부분의 현대 PHP 툴처럼 Composer의 dependency들을 설명해주는 파일인 `composer.json` 파일로 정의된 external dependency들이 있다.
+
+여기서 우리는 단순히 Drupal을 다운로드하고 브라우저상으로 몇몇 setup을 수행하지만, playbook의 목적은 fully-automated가 되는 것이고, Drupal installation의 idempotent 속성을 부여하는 것이다.
+따라서 우리는 Composer를 설치하고나서 Drush를 설치할 것이다.
+
+```yaml
+  - name: Install Composer into the current directory.
+    shell: >
+      curl -sS https://getcomposer.org/installer | php
+      creates=/usr/local/bin/composer
+  
+  - name: Move Composer into globally-accessible location.
+    shell: >
+      mv composer.phar /usr/local/bin/composer
+      creates=/usr/local/bin/composer
+```
+
+첫번째 명령어는 `composer.phar` PHP application archive를 생성하는 Composer의 php-based installer를 실행시킨다.
+이 archive는 (shell command에서는 `mv`를 이용하여) `/usr/local/bin/compsoer`로 복사되고 이를 통해 간단히 `composer` 명령어만 사용하여 Drush의 dependency들을 설치할 수 있다.
+각 명령어는 `/usr/local/bin/composer` 파일이 존재하지 않을 때에만 동작하도록 설정되어있다(`creates` parameter를 통해).
+
+{{% notice notes %}}
+
+왜 `command` 대신에 `shell`을 사용하는가?
+Ansible의 `command` module은 host에서 명령을 실행할 때 많이 사용하는 option이다(Ansible의 module이 충분하지 않을 때).
+그리고 이는 대부분의 시나리오에서 작동한다.
+하지만 `command`는 remote shell `/bin/sh`를 통해 command를 실행할 수 없고 따라서 `<`, `>`, `|`, `&`같은 옵션과 `$HOME`같은 local environment variables가 작동하지 않는다.
+`shell`은 command의 ouput을 다른 command로 pipe를 연결해주고 local environment에 접속할 수도 있다.  
+remote로 shell command를 실행시키는 것을 도와주는 module은 두가지가 더 있다.
+`script`는 shell scripts(하지만 shell script를 idempotent한 Ansible playbook로 바꾸는 것이 무조건 좋다)를 실행하고, `raw`는 raw commands를 SSH(다른 옵션을 사용하지 못할때만 사용해야한다)를 통해 실행한다.  
+Ansible module을 모든 task에 사용하는 것이 가장 좋다.
+만약 regular command line command를 사용해야만 한다면 `command` module을 먼저 시도해 보아라.
+위에서 언급한 option들을 필요로 한다면 `shell`을 사용해라.
+`script`나 `raw`는 최대한 사용하지 말아야 하고 이 책에서는 다루지 않을 것이다.
+
+{{% /notice %}}
+
+이제 GitHub를 사용하여 가장 최근 버전의 Drush를 install할 것이다.
+
+```yaml
+  - name: Check out drush master branch
+    git:
+      repo: https://github.com/drush-ops/drush.git
+      dest: /opt/drush
+  
+  - name: Install Drush dependencies with Composer.
+    shell: >
+      /usr/local/bin/composer install
+      chdir=/opt/drush
+      creates=/opt/drush/vendor/autoload.php
+
+  - name: Create drush bin symlink.
+    file:
+      src: /opt/drush/drush
+      dest: /usr/local/bin/drush
+      state: link
+```
+
+이 책의 앞부분에서 우리는 ad-hoc command를 통해 git repository를 clone하였다.
+이번에는 `git` module을 사용하는 play를 정의하고 이를 통해 GitHub의 repository URL을 가지고 Drush를 clone할 것이다.
+우리는 master branch를 사용할 것이기 때문에 `repo`(repository URL)과 `dest`(destination path) parameter를 넣어주어야 한다.
+
+drush가 `/opt/drush`로 다운로드되고 나면, Composer를 사용하여 모든 필요한 dependency들을 설치한다.
+이 경우 우리는 Ansible이 `composer install`를 `/opt/drush` 폴더에서 실행하길 원하고(이는 Composer가 자동으로 drush의 `composer.json` 파일을 검색하여 그렇게 된다) 따라서 우리는 parameter로 `chdir=/opt/drush`를 전달해주어야 한다.
+Composer가 끝나고 나면 `/opt/drush/vendor/autoload.php`는 생성될 것이고 `creates` 파라미터를 사용하여 Ansible에게 파일이 이미 존재할 경우 이 단계를 건너뛰게 할 것이다(idempotency를 위해).
+
+최종적으로 우리는 `/usr/local/bin/drush`에서 `/opt/drush/drush`로 symlink를 걸어주어 `drush` command가 시스템의 어느곳에서든지 실행할 수 있도록 하였다.
+
+### Install Drupal with Git and Drush
+
+우리는 다시 `git`을 사용하여 Drupal을 이전에 virtualhost configuration에서 정의한 대로 apache document root로 clone할 것이다.
+그러고나서 Drupal의 installation을 drush를 통해 하고 다른 파일 permission issue들을 수정하여 Drupal이 VM에서 제대로 load되도록 설정할 것이다.
+
+```yaml
+  - name: Check out Drupal Core to the Apache docroot.
+    git:
+      repo: http://git.drupal.org/project/drupal.git
+      version: "{{ drupal_core_version }}"
+      dest: "{{ drupal_core_path }}"
+  
+  - name: Install Drupal.
+    command: >
+      drush si -y --site-name="{{ drupal_site_name }}" --acount-name=admin
+      --account-pass=admin --db-url=mysql://root@localhost/{{ domain }}
+      chdir={{ drupal_core_path }}
+      creates={{ drupal_core_path }}/sites/default/settings.php
+    notify: restart apache
+
+  # SEE: https://drupal.org/node/2121849#comment-8413637
+  - name: Set permissions properly on settings.php.
+    file:
+      path: "{{ drupal_core_path }}/sites/default/settings.php"
+      mode: 0744
+
+  - name: Set permissions on files directory.
+    file:
+      path: "{{ drupal_core_path }}/sites/default/files"
+      mode: 0777
+      state: directory
+      recurse: yes
+```
+
+먼저 우리는 `vars.yml`파일 안에 정의된 `drupal_core_version`값으로 `version`을 지정하여 Drupal의 git repository를 clone할 것이다.
+`git` module의 `version` parameter는 branch(`master`, `8.0.x` 등)와 tag(`1.0.1`, `7.24` 등) 또는 개별 commit hash(`50a1877` 등)를 지정하여 clone할 수 있다.
+
+그 다음 Drush의 `si` 명령어(`site-install`의 줄임말)는 사용하여 Drupal의 installation(database를 configure하고, 몇가지 maintenance를 실행하고, site를 위한 몇몇 default configuration setting을 설정한다)을 실행할 것이다.
+`drupal_core_version`과 `domain`같은 몇가지 variable들을 전달한다.
+또한 `drupal_site_name`을 추가하여 varaible을 `vars.yml` 파일에 추가한다.
+
+```yaml
+# Your Drupal site name.
+drupal_site_name: "D8 Test"
+```
+
+또한, Drupal의 installation process는 결과적으로 `settings.php` 파일을 생성한다.
+따라서 우리는 해당 파일의 location을 `creates` parameter를 통해 Ansible이 site가 이미 설치되었는지를 판단하도록 할 수 있다(따라서 실수로 재설치하지 않는다).
+site가 install되고 나면, Apache도 재시작할 것이다.
+(Apache의 configuration을 업데이트할 때 사용했던 것처럼 `notify`를 다시 사용할 것이다.)
+
+마지막 두 task는 Drupal의 `settings.php`와 폴더들의 permission을 각각 `744`와 `777`로 설정하는 것이다.
+
+### Drupal LAMP server summary
+
+이제 `http://drupaltest.dev/`로 서버에 접속하게 되면(`drupaltest.dev`가 VM의 IP주소를 가르킨다고 가정한다) Drupal의 default home page를 볼 수 있고 `admin/admin`으로 접속이 가능하다.
+(production server에서는 명백히 안전한 password를 설정해야 한다)
+
+Apache, MySQL, PHP를 실행하는 비슷한 server configuration으로 Drupal뿐 아니라 Symfony, Wordpress, Joomla, Laravel 등과 같은 다른 web frameworks와 CMS들을 실행할 수 있다.
+
+{{% notice notes %}}
+
+전체 Drupal LAMP server playbook의 예시는 책의 code repository인 <https://github.com/geerlingguy/ansible-for-devops>의 `drupal` directory에서 확인할 수 있다.
+
+{{% /notice %}}
+
+## Real-world playbook: Ubuntu Apache Tomcat server with Solr
+
+Apache Solr는 full-text search, word highlighting, faceted search, fast indexing 등에 optimize된 빠르고 scalable한 search server이다.
+매우 유명한 search server로 Ansible을 통해 설치하고 설정하기가 꽤 쉽다.
+다음의 example에서 우리는 Apache Solr를 Ubuntu 12.04와 Apache Tomcat을 통해 설정할 것이다.
+
+```plain
++-----------------------------------+
+|                                   |
+|       Apache Solr Server/VM       |
+|                                   |
++-----------------------------------+
+|                                   |
+| +-------------------------------+ |
+| |                               | |
+| |        Apache Solr 4.x        | |
+| |                               | |
+| +-------------------------------+ |
+|                                   |
+| +-------------------------------+ |
+| |                               | |
+| |        Apache Tomcat 7        | |
+| |                               | |
+| +-------------------------------+ |
+|                                   |
+| +-------------------------------+ |
+| |                               | |
+| |      Ubuntu 12.04 (Linux)     | |
+| |                               | |
+| +-------------------------------+ |
+|                                   |
++-----------------------------------+
+```
+
+**Apache Solr Server.**
+
+### Include a variables file, and discover `pre_tasks` and `handlers`
+
+이전의 LAMP server 예시처럼 우리는 분리된 `vars.yml` 파일에 있는 variable들을 Ansible에게 알려주는 것으로부터 playbook을 시작한다.
+
+```yaml
+- hosts: all
+  
+  vars_files:
+  - vars.yml
+```
+
+`vars.yaml`에 대해 생각해보는 동안 빠르게 `vars.yaml` 파일을 생성하자.
+Solr playbook과 동일한 폴더에 파일을 생성하고 다음의 내용을 추가하자.
+
+```yaml
+download_dir: /tmp
+solr_dir: /opt/solr
+```
+
+이 두 변수는 Apache Solr를 다운로드하고 설치하는 동안 사용할 path를 정의한 것이다.
+
+`vars_files`를 마치고 playbook으로 돌아와서 우리는 `pre_tasks`를 사용하여 apt cache가 업데이트되도록 할 것이다.
+
+```yaml
+  pre_tasks:
+  - name: Update apt cache if needed.
+    apt: update_cache=yes cache_valid_time=3600
+```
+
+Drupal playbook처럼 우리는 다시 `handlers`를 사용하여 `tasks` section에서 notify를 받는 특정한 tasks를 정의할 것이다.
+이번에는 handler를 사용하여 Apache Solr에 영향을 주는 `tomcat7`과 Java servlet container를 재시작할 것이다.
+
+```yaml
+  handlers:
+  - name: restart tomcat
+    service: name=tomcat7 state=restarted
+```
+
+우리는 playbook 안에서 handler를 `notify: restart tomcat` 옵션을 통해 호출할 것이다.
+
+### Install Apache Tomcat 7
+
+Ubunntu 특정 서버에서 Tomcat7을 설치하는 것은 쉽다.
+apt repository에 package가 있기 때문에 우리는 이것이 설치 되었는지, `tomcat7` service가 enabled 되었고 start 되었는지만 확인하면 된다.
+
+```yaml
+  tasks:
+  - name: Install Tomcat 7.
+    apt: "name={{ item }} state=installed"
+    with_items:
+      - tomcat7
+      - tomcat7-admin
+      - 
+  - name: Ensure Tomcat 7 is started and enabled on boot.
+    service: name=tomcat7 state=started enabled=yes
+```
+
+엄청 쉽다.
+우리는 `apt` module을 이용하여 `tomcat7`과 `tomcat7-admin` 두 package를 설치하였다(그래서 우리는 Tomcat의 administrative backend에 로그인할 수 있다).
+그리고 `tomcat7`을 시작하고 system boot할 때 start 되도록 설정한다.
+
+### Install Apache Solr
+
+Ubuntu 12.04는 Apache Solr에 대한 package를 포함한다.
+하지만 매우 오래된 버전을 설치하기 때문에 우리는 source로부터 Solr의 최신 버전을 설치할 것이다.
+첫번째 단계는 source를 다운로드하는 것이다.
+
+```yaml
+  - name: Download Solr.
+    get_url:
+      url: http://apache.osuosl.org/lucene/solr/4.9.1/solr-4.9.1.tgz
+      dest: "{{ download_dir }}/solr-4.9.1.tgz"
+      sha256sum: 4a546369a31d34b15bc4b99188984716bf4c0c158c0e337f3c1f98088aec70ee
+```
+
+우리는 가장 최근의 stable 버전인 Apache Solr 4.9.1을 설치한다.
+remote server에서 파일을 다운로드 했을 때 `get_url` module은 raw `wget`이나 `curl` 명령어보다 더 유연함과 편리함을 제공한다.
+
+`get_url`에 `url`(파일 소스를 다운로드할 주소)과 `dest`(다운로드된 파일이 위치할 곳)를 전달해 주어야 한다.
+`dest` parameter로 디렉토리를 넘기면 Ansible은 파일을 안에다가 위치시키지만 나중에 playbook이 실행될 때마다 다시 다운로드할 것이다(만약 변경사항이 있다면 기존의 것은 overwrite된다).
+이런 overhead를 피하기 위해 우리는 다운로드할 파일의 full path를 입력한다.
+
+우리는 안정성을 위해 optional parameter인 또한 `sha256sum`을 사용한다.
+파일이나 archive를 다운로드 하면 application의 functionality와 security의 취약점이 되기 때문에 file이 우리가 생각하는 것과 동일한지 확인하는 것은 좋은 생각이다.
+`sha256sum`은 다운로드된 파일에서 data의 hash와 지정한 256-bit hash(`shasum -a 256 /path/to/file`을 통해 파일의 `sha256sum`을 얻을 수 있다)를 비교한다.
+checksum이 제공한 hash와 일치하지 않으면 Ansible은 fail될 것이고 새로워진(그리고 유효하지 않는) 다운로드 파일을 버릴 것이다.
+
+```yaml
+  - name: Expand Solr.
+    command: >
+      tar -C /tmp -xvzf {{ download_dir }}/solr-4.9.1.tgz
+      creates={{ download_dir }}/solr-4.9.1/dist/solr-4.9.1.war
+
+  - name: Copy Solr into place.
+    command: >
+      cp -r {{ download_dir }}/solr-4.9.1 {{ solr_dir }}
+      creates={{ solr_dir }}/dist/solr-4.9.1.war
+```
+
+우리는 Apache Solr archive를 압축해제하고 위치로 복사해야 한다.
+이 두 단계를 위해 내장된 `tar`과 `cp` utility를 (적절한 옵션을 가지고) 사용한다.
+`creates`를 설정하는 것은 Ansible이 나중에 다시 실행되었을 때 Solr war file이 이미 존재하기 때문에 이 단계를 건너 뛰게 한다.
+
+```yaml
+  # Use shell so commands are passed in correctly.
+  - name: Copy Solr components into place.
+    shell: >
+      cp -r {{ item.src }} {{ item.dest }}
+      creates={{ item.creates }}
+    with_items:
+      # Solr example configuration and war file.
+      - {
+        src: "{{ solr_dir }}/example/webapps/solr.war",
+        dest: "{{ solr_dir }}/solr.war",
+        creates: "{{ solr_dir }}/solr.war"
+      }
+      - {
+        src: "{{ solr_dir }}/example/solr/*",
+        dest: "{{ solr_dir }}/",
+        creates: "{{ solr_dir }}/solr.xml"
+      }
+      # Solr log4j logging configuration
+      - {
+        src: "{{ solr_dir }}/example/lib/ext/*",
+        dest: "/var/lib/tomcat7/shared/",
+        creates: "/var/lib/tomcat7/shared/log4j-1.2.16.jar"
+      }
+      - {
+        src: "{{ solr_dir }}/example/resources/log4j.properties",
+        dest: "/var/lib/tomcat7/shared/classes",
+        creates: "/var/lib/tomcat7/shared/classes/log4j.properties"
+      }
+    notify: restart tomcat
+```
+
+다음 task는 Apache Solr를 실행하는데 필요한 특정 디렉토리와 파일을 복사하는 단계이다.
+
+여기서는 특별한게 없지만 이 예시는 `with_items` lists안에서 comment를 사용하여 list안의 item들을 명시해주는 것을 보여준다.
+우리는 각 command들을 각각 따로 task로 만들 수 있지만 이렇게 한 이유는 총 Ansible task의 수를 줄여주고 `with_items` list를 필요시 external variable로 옮기기 위한 것이다.
+
+```yaml
+  - name: Ensure solr example directory is absent.
+    file: 
+      path: "{{ solr_dir }}/example"
+      state: absent
+
+  - name: Set up solr data directory
+    file:
+      path: "{{ solr_dir }}/data"
+      state: directory
+      owner: tomcat7
+      group: tomcat7
+```
+
+최신 버전의 Apache Solr는 `{{ solr_dir }}` 폴더 내부를 모두 resursive하게 검색하여 potential search configuration을 로딩한다.
+우리는 서버의 default search core를 사용하기 위해 example 중 하나를 복사하였기 때문에 Solr는 그 examplㄷ과 duplicate라고 알게되고 crash가 날 것이다.
+따라서 우리는 `file` module에 `path`를 사용하여 example directory가 없도록 할 것이다(`state=absent`).
+
+example directory를 지우고 나서(다음에 실행할 때에도 없어져 있어야 한다) 우리는 Solr가 index data를 저장할 data directory가 존재하고 `tomcat7` user와 group으로 owner를 설정되도록 해야한다.
+
+```yaml
+  - name: Configure solrconfig.xml for new data directory.
+    lineinfile:
+      dest: "{{ solr_dir }}/collection1/conf/solrconfig.xml"
+      regexp: "^.*<dataDir.+%"
+      line: "<dataDir>${solr.data.dir:{{ solr_dir }}/data}</dataDir>"
+      state: present
+```
+
+앞에서 보았듯이 `lineinfile`은 idempotent하게 configuration file setting이 존재하는지 확인하는 데 유용한 module이다.
+이 경우에 우리는 `<dataDir>` 줄이 우리 default search core의 configuration에 특정한 값으로 설정되어있는지 확인해야한다.
+
+```yaml
+  - name: Set permissions for solr home.
+    file:
+      path: "{{ solr_dir }}"
+      recurse: yes
+      owner: tomcat7
+      group: tomcat7
+```
+
+`{{ solr_dir }}`의 전체 content에서 ownership option을 알맞게 설정하기 위해 우리는 `file` module을 `recurse` parameter를 `yes`로 설정하여 사용할 것이다.
+이는 shell command에서의 `chown -R tomcat7:tomcat7 {{ solr_dir }}`과 동일하다.
+
+```yaml
+  - name: Add Catalina configuration for solr.
+    template:
+      src: templates/solr.xml.j2
+      dest: /etc/tomcat7/Catalina/localhost/solr.xml
+      owner: root
+      group: tomcat7
+      mode: 0644
+    notify: restart tomcat
+```
+
+마지막 task는 template file (`solr.xml.j2`)를 remote host로 복사하고 Jinja2 문법으로 variable들을 대체한 뒤 file의 ownership과 permission을 Tomcat에 필요한 것으로 설정한다.
+
+task가 실행되기 전에 local template file은 생성이 되어있어야 한다.
+`templates` 폴더를 Apache Solr playbook의 디렉토리와 같은 곳에서 생성하고 다음의 내용으로 `solr.xml.j2`를 그 안에 생성한다.
+
+```yaml
+<?xml version="1.0" encoding="utf-8"?>
+<Context docBase="{{ solr_dir }}/solr.war" debug="0" crossContext="true">
+  <Environment name="solr/home" type="java.lang.String" value="{{ solr_dir }}" override="true"/>
+</Context>
+```
+
+playbook을 `$ ansible-playbook [playbook-name.yml]`로 실행하고 몇분 후에(서버의 인터넷 환경에 따라 다르다) Solr admin interface로 `http://example.com:8080/solr`를 통해 접속할 수 있다(`example.com`이 우리 서버의 hostname이나 IP 주소로 바뀌어야 한다).
+
+### Apache Solr server summary
+
+Apache Solr를 deploy할 때 사용했던 configuration은 multicore setup을 할 수 있고 따라서 우리는 admin interface를 통해 'search cores'를 추가할 수 있다(디렉토리와 core schema configuration이 filesystem에 위치시킨다).
+그리고 multiple website와 application을 위한 multiple indexes를 가질 수 있다.
+
+위에서 보앗던 것과 유사한 playbook은 Drupal website에 대한 Apache Solr search core를 hosts하는 service인 infrastructure for Hosted Apache Solr의 일부로 사용되었다.
+
+{{% notice notes %}}
+
+전체 Apache Solr server playbook에 대한 예제는 이 책의 code repository인 <https://github.com/geerlingguy/ansible-for-devops>의 `solr` directory에서 확인 가능하다.
+
+{{% /notice %}}
+
+## Summary
+
+이제 우리는 Ansible의 `modus operandi`에 친숙해지게 되었다.
+Playbook은 Ansible의 configuration management와 provisioning 기능의 심장이고 동일한 module과 비슷한 syntax로 ad-hoc command를 사용하여 일반 서버 management에 deployment를 할 수 있다.
+
+이제 playbook에 친숙해졌으니 task의 organization, condition, variable과 같은 playbook을 만드는 좀 더 깊숙한 개념들에 대해 알아볼 것이다.
+나중에 우리는 role을 통한 playbook의 사용법을 배워 이를 무한정으로 유연하고 infrastructure를 configure하고 setting하는 데 드는 시간을 줄일 것이다.
+
+
+
+
