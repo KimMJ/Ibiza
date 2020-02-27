@@ -1,5 +1,5 @@
 ---
-title: "How to Edit Boot Parameter During Install"
+title: "Ubuntu 설치 시 Boot Parameter를 수정하기"
 date: 2020-01-08T01:52:12+09:00
 tags: ["ubuntu", "install", "boot parameter"]
 weight: 10

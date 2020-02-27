@@ -1,7 +1,7 @@
 ---
-title: "Unattended Ubuntu"
+title: "추가 입력절차(prompt) 없이 Ubuntu 설치하는 이미지 만들기"
 date: 2020-01-08T01:52:32+09:00
-tags: ["ubuntu 18.04 server", "preseed.cfg"]
+tags: ["ubuntu-18.04-server", "preseed.cfg"]
 weight: 10
 pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---

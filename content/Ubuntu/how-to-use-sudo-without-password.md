@@ -1,5 +1,5 @@
 ---
-title: "How to Use Sudo Without Password"
+title: "sudo를 password 없이 사용하기"
 date: 2020-01-08T01:51:54+09:00
 tags: ["sudo", "passwordless", "ubuntu"]
 weight: 10
