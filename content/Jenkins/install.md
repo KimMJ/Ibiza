@@ -8,45 +8,21 @@ tags: ["jenkins", "install"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
-## Download docker-compose.yaml
+## Configure docker-compose.yaml
 
-[링크](https://hub.docker.com/r/bitnami/jenkins/)를 참조하여 docker-compose.yml을 다운로드 받습니다.
-
-```bash
-curl -sSL https://raw.githubusercontent.com/bitnami/bitnami-docker-jenkins/master/docker-compose.yml > docker-compose.yml
-```
-
-현재 yaml은 다음과 같은 구성입니다.
+다음과 같이 `docker-compose.yaml` 파일을 적절한 디렉토리에 생성합니다.
 
 ```yaml
 version: '2'
 services:
   jenkins:
-    image: 'bitnami/jenkins:2'
-    ports:
-      - '80:8080'
-      - '443:8443'
-      - '50000:50000'
-    volumes:
-      - 'jenkins_data:/bitnami'
-volumes:
-  jenkins_data:
-    driver: local
-```
-
-여기서 몇가지 설정을 추가해주도록 합니다.
-
-```yaml
-version: '2'
-services:
-  jenkins:
-    image: 'bitnami/jenkins:2'
+    image: 'jenkins/jenkins:lts'
     ports:
       - '38080:8080'
       - '38443:8443'
       - '50000:50000'
     volumes:
-      - 'jenkins_data:/bitnami'
+      - 'jenkins_data:/var/jenkins_home'
 volumes:
   jenkins_data:
     driver: local
@@ -63,15 +39,52 @@ volumes:
 mkdir jenkins_data
 ```
 
-그 다음 실행합니다.
+## Start Jenkins
+
+이제 `docker-compose` 명령어를 통해 실행합니다.
 
 ```bash
-docker-compose up -d
+sudo docker-compose up -d
 ```
 
 `http://$IP:38080` 으로 접속할 수 있습니다.
-기본 ID/PASSWD는 (user/bitnami)입니다.
+로컬에 설치하셨다면 `http://localhost:38080`으로 접속하면 됩니다.
+
+## Jenkins 세팅
+
+처음에 다음과 같은 화면을 볼 수 있습니다.
+
+![Jenkins-start](/images/Jenkins/Jenkins-start.png)
+
+여기서 `/var/jenkins_home/secrets/initialAdminPassword`의 내용을 아래 칸에 입려하라고 지시합니다.
+
+저희는 앞서 `$PWD/jenkins_data`를 `/var/jenkins_home`에 binding했으므로, `$PWD/jenkins_data/secrets/initialAdminPassword`를 확인하면 됩니다.
+또는 docker container에 직접 접속해서 해당 path로 이동 후 값을 확인해도 됩니다.
+
+이제 다음과 같은 화면이 뜰 것입니다.
+
+![Jenkins-plugin-install](/images/Jenkins/Jenkins-plugin-install.png)
+
+여기서는 왼쪽의 `Install suggested plugins`를 선택해줍니다.
+
+다음과 같이 설치가 진행됩니다.
+
+![Jenkins-plugin-installing](/images/Jenkins/Jenkins-plugin-installing.png)
+
+위의 plugin 설치과정이 완료되고 나면 다음과 같은 admin 계정 생성에 관한 화면이 나옵니다.
+
+![Jenkins-admin-user](/images/Jenkins/Jenkins-admin-user.png)
+
+알맞게 입력을 한 뒤 저장하면 접속 URL을 작성하라고 합니다.
+default로 적어져 있으니 확인후 변경이 필요하면 바꾸면 됩니다.
+
+![Jenkins-address](/images/Jenkins/Jenkins-address.png)
+
+여기까지 하면 기본 설정은 다 끝났습니다.
+Jenkins가 준비될 때까지 잠시 기다리면 home 화면이 뜹니다.
+
+![Jenkins-home](/images/Jenkins/Jenkins-home.png)
 
 ## Reference
 
-* <https://hub.docker.com/r/bitnami/jenkins/>
+* <https://hub.docker.com/_/jenkins/>
