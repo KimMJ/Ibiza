@@ -246,7 +246,7 @@ pane을 여러개 쓰다가 하나만 크게 보고싶은 경우가 있을 수 �
 [prefix] alt+2 # 수평
 ```
 
-#### Reference
+## Reference
 
 * https://gist.github.com/MohamedAlaa/2961058
 * https://gist.github.com/andreyvit/2921703
