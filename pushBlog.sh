@@ -2,8 +2,8 @@
 
 hugo
 cd public
-cp -r . ../../kimmj.github.io/
-cd ../../kimmj.github.io
+cp -r . /home/wanderlust/blog/kimmj.github.io/
+cd /home/wanderlust/blog/kimmj.github.io
 
 git add .
 message="update blog with script $(date '+%Y-%m-%d %H:%M:%S')"
