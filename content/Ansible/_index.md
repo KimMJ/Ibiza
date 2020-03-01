@@ -7,5 +7,3 @@ pre: "<i class='fas fa-angle-right'></i>&nbsp;"
 ---
 
 # Ansible
-
-Ansible은 자동화를 할 때 사용하는 툴입니다.

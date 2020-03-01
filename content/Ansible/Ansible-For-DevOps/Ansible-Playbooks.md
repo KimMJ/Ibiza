@@ -94,7 +94,7 @@ command module은 다른 트릭들을 가지고 있지만 지금 우리는 shell
 ```yaml
 ---
 - hosts: all
-  sudo: yes
+  become: yes
   tasks:
   - name: Install Apache.
     yum: name={{ item }} state=present
@@ -127,7 +127,7 @@ command module은 다른 트릭들을 가지고 있지만 지금 우리는 shell
 1. 처음에 `---`는 이 문서를 YAML syntax를 가지고 사용했다고 표시한 것이다.
    마치 HTML의 맨 위에 `<html>`을 쓰는것 또는 PHP code block 제일 위에 `<?php`를 넣는것과 같다.
 2. 둘째 줄의 `- hosts: all`은 첫(이 경우는 유일하게) `play`를 정의한 것이고 `Ansible`이 알고있는 `all` hosts에서 play를 실행하도록 한다.
-3. 셋째 줄에서 `sudo: yes`는 `Ansible`이 모든 명령어를 `sudo`를 통해 실행하도록 하고 따라서 모든 명령어는 root 유저로 실행될 것이다.
+3. 셋째 줄에서 `become: yes`는 `Ansible`이 모든 명령어를 `sudo`를 통해 실행하도록 하고 따라서 모든 명령어는 root 유저로 실행될 것이다.
 4. 네번째 줄에서 `tasks:`는 `Ansible`이 다음의 task 목록들을 이 playbook의 일부로 실행하도록 하는 것이다.
 5. 첫번째 task는 `name: Install Apache...`로 시작하고 name은 서버에서 어떤 동작을 하는 module은 아니다.
    그냥 사람이 읽을 수 있는 description을 제공한다.
@@ -306,6 +306,7 @@ key-based 인증방식을 사용하여 서버에 접속하지 않는다면(챕�
 ```yaml
 ---
 - hosts: all
+  become: yes
   tasks:
 ```
 
@@ -363,24 +364,24 @@ GPG는 `GNU Privacy Guard`로, developer와 package distributor가 그들의 pac
   rpm_key: "key={{ item }} state=present"
   with_items:
   - "https://fedoraproject.org/static/0608B895.txt"
-  - "http://rpms.famillecollect.com/RPM-GPG-KEY-remi"
+  - "http://rpms.famillecollet.com/RPM-GPG-KEY-remi"
 
 - name: Install EPEL and Remi repos.
   command: "rpm -Uvh --force {{ item.href }} creates={{ item.creates }}"
   with_items:
   - {
-    href: "http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.prm",
+    href: "http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm",
     creates: "/etc/yum.repos.d/remi.repo"
   }
 
-- name: Disable firewall (since this is a dev environment).
-  service: name=iptables state=stopped enabled=no
+- name: Ensure firewalld is stopped (since this is a test server).
+  service: name=firewalld state=stopped
 
 - name: Install Node.js and npm.
   yum: name=npm state=present enablerepo=epel
 
 - name: Install Forever (to run our Node.js app).
-  npm: name=forever global=yes state-latest
+  npm: name=forever global=yes state=present
 ```
 
 한 단계씩 살펴보자.
@@ -485,6 +486,7 @@ Node는 매우 간단한 언어(JavaScript)이기 때문에 간단하고 가벼�
   command: forever list
   register: forever_list
   changed_when: false
+  
 - name: Start example Node.js app.
   command: "forever start {{ node_apps_location }}/app/app.js"
   when: "forever_list.stdout.find('{{ node_apps_location }}/app/app.js') == -1"
@@ -1220,7 +1222,3 @@ Playbook은 Ansible의 configuration management와 provisioning 기능의 심장
 
 이제 playbook에 친숙해졌으니 task의 organization, condition, variable과 같은 playbook을 만드는 좀 더 깊숙한 개념들에 대해 알아볼 것이다.
 나중에 우리는 role을 통한 playbook의 사용법을 배워 이를 무한정으로 유연하고 infrastructure를 configure하고 setting하는 데 드는 시간을 줄일 것이다.
-
-
-
-

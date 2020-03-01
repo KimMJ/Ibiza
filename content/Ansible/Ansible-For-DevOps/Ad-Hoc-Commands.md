@@ -48,7 +48,7 @@ pre: "<i class='fas fa-minus'></i>&nbsp;"
 이 예시에서 우리는 `Vagrantfile`에 정의된 `Vagrant`의 기본 설정들을 사용할 것이다.
 이 예시에서 우리는 `Vagratn`의 강력한 multi-machine management feature를 사용할 것이다.
 
-![multi-machine management](/images/Ansible/multi-machine-management)
+![multi-machine management](/images/Ansible/Ansible-for-DevOps/multi-machine-management.png)
 
 우린 3개의 VM을 생성할 것이다.
 (두개의 app server, 하나의 database server)

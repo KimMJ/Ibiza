@@ -8,97 +8,98 @@ tags: ["kubernetes", "pod"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
-Pod
+## Pod Overview
 
-Pod는 Kubernetes에서 가장 작은 배포 오브젝트. 최소 관리 단위.
-클러스터에서 실행중인 프로세스를 의미
-어플리케이션 콘테이너, 스토리지 리소스, 유일한 network ip, 컨테이너가 어떻게 실행할지를 캡슐화
+### Pod의 이해
 
-각각의 파드는 주어진 어플리케이션에서 단일 인스턴스를 수행한다.
--> 어플리케이션을 수직확장하고 싶다면 각 인스턴스에 대해 여러 파드를 생성하면 된다.
+Pod는 Kubernetes에서 가장 작은 배포 오브젝트이며 쿠버네티스에서 관리하는 최소 관리 단위입니다.
+Pod는 cluster 안에서 실행중인 어떤 프로세스를 의미합니다.
+application container, 스토리지 리소스, 유일한 network ip, container가 어떻게 실행할지를 캡슐화한 것입니다.
 
-파드는 서비스에서 서로 연관성이 높은 프로세스를 지원하기 위해 디자인되었다.
-컨테이너는 리소스와 의존성들을 공유하고, 서로 통신하며, 언제/어떻게 종료하는지에 대해 조정한다.
+각각의 Pod는 주어진 application에서 단일 인스턴스를 수행합니다.
+즉, 한가지 역할을 맡고 있다고 생각하시면 됩니다..
+따라서 application을 수직확장하고 싶다면 각 인스턴스에 대해 여러 Pod를 생성하면 된다.
+그러면 동일한 역할을 하는 Pod가 늘어나니, 병렬적으로 처리가 가능할 것입니다.
 
-파드 내에 여러 컨테이너를 두는 것은 컨테이너가 정말 강하게 결합될 때 이다.
+Pod는 서비스 중에서 서로 연관성이 높은 프로세스를 지원하기 위해 디자인되었습니다.
+container는 리소스와 의존성들을 공유하고, 서로 통신하며, 언제/어떻게 종료하는지에 대해 서로 조정합니다.
+Pod 내의 container는 Networking과 Storage를 공유할 수 있습니다.
 
-init container로 app container가 시작하기 전의 동작을 할 수 있다.
-파드 내의 컨테이너는 Networking과 Storage를 공유한다.
+Pod 안에는 둘 이상의 container가 있을 수 있습니다.
+이 때 Pod 내에 여러 container를 두는 것은 container가 정말 강하게 결합될 때 입니다.
+예를 들어, 하나의 container는 web server로 shared volume에서 파일을 가져와 호스팅하는 역할을 하고, 나머지 하나의 side-car container는 외부에서 file을 pulling하여 shared volume에 올리는 역할을 하는 것입니다.
+이처럼 둘간의 결합성이 큰 경우(여기서는 shared volume일 것입니다) 동일한 Pod에 위치할 수 있습니다.
 
-Networking
-각 파드 단위로 네트워크 IP 주소를 할당받는다. 그 내부의 컨테이너는 localhost로 통신하게 되고 외부와의 통신을 위해선 공유중인 네트워크 리소스를 어떻게 분배할 지 합의 및 조정해야한다. (port)
+init container는 실제 app container가 시작하기 전에 먼저 작업을 하는 container입니다.
 
-Storage
-파드는 공유하는 저장공간을 volumes로 지정한다. 하나의 컨테이너만 재시동되는 경우에도 데이터를 보존할 수 있다.
+#### Networking
+각 Pod 단위로 네트워크 IP 주소를 할당받습니다.
+그 내부의 container끼리는 localhost로 통신하게 되고 외부와의 통신을 위해선 공유중인 네트워크 리소스를 어떻게 분배할 지 합의 및 조정해야합니다.
+예를 들어 Pod 단위로 생각해보면 하나의 IP를 가지게 되고 expose할 port들을 가지게 될 것입니다.
+IP는 상관 없지만 port의 경우 특정 container로 binding이 되어야 하기 때문에 각 container는 동일한 port를 expose할 수 없습니다.
+Pod 관점에서 보면 어느 container로 전달해주어야 하는지 모르기 때문이죠.
 
-파드는 하나만 생성하지 말 것.
+#### Storage
+Pod는 공유하는 저장공간을 volumes로 지정합니다.
+이렇게 하면 하나의 container만 재시동되는 경우에도 데이터를 보존할 수 있습니다.
 
-파드의 재시작과 컨테이너의 재시작을 헷갈려하면 안된다. 파드 자체만으로는 동작하지 않고, 오히려 컨테이너가 동작하는 환경이라고 보면 된다. 삭제 전까지는 유지 되는.
+### Pod로 작업하기
 
-파드는 컨테이너 전에 VM에서 하나의 VM에 실행하는 것들처럼 하나의 논리적 호스트에서 컨테이너들을 실행하는 개념이다.
+Pod를 사용할 때에는 `kubectl create pods`처럼 controller 없이 Pod를 생성하는 것은 좋은 생각이 아닙니다.
+이렇게 할 경우 Kubernetes의 장점들을 충분히 활용할 수 없습니다.
+특히 self-healing을 하지 못하기 때문에 Pod가 떠있던 노드에 장애가 발생하면 Pod는 영영 복구되지 않을 수 있습니다.
+반면 controller로 관리할 경우 self-healing을 지원하여 노드에 장애가 발생해도 다른 노드에 해당 Pod를 띄워서 계속하여 서비스를 할 수 있습니다.
 
-파드 내의 컨테이너들은 IP주소와 port space를 공유한다.
-그리고 localhost로 통신한다. + SystemV semaphore, POSIX shared memory로 통신 가능
-다른 파드에 있는 컨테이너와는 IP 주소로 통신
+Pod의 재시작과 container의 재시작을 혼동하면 안됩니다.
+Pod는 그 자체만으로 동작하지 않습니다.
+오히려 Pod는 삭제되기 전까지 계속 유지가 되는, container가 동작하는 환경이라고 보면 됩니다.
+Pod를 VM을 사용하는 상황과 비유를 해보자면 Pod는 VM에서 하나의 VM에 실행하는 application들처럼 하나의 논리적 호스트에서 container들을 실행하는 개념입니다.
 
-Volumes도 공유 가능
+Pod 내의 container들은 IP주소와 port space를 공유합니다.
+그리고 서로 localhost로 통신할 수 있습니다.
+반면에 다른 Pod에 있는 container와는 Pod에 할당된 IP를 사용하여 통신할 수 있습니다.
 
-파드는 컨테이너처럼 임시적인 자원이기 때문에 삭제시 reschedule이 아닌 새로운 동일한 spec의 파드를 생성한다. (새로운 UID로)
-
-volume도 파드가 삭제되면 삭제된다.
-
-각각의 파드는 보통 하나의 어플리케이션의 여러 인스턴스를 담당하지 않는다.
-
-왜 하나의 컨테이너에서 여러 프로그램을 돌리지 않는가?
-
-* 투명성
-* 쓰기 쉬움
-* 소프트웨어 의존성 제거
-* 효율성
-
-`privileged` 플래그로 LINUX단의 조작을 할 수 있다.
+Pod는 container처럼 임시적인 자원이기 때문에 삭제시 reschedule이 아닌 새로운 동일한 spec의 Pod를 새로운 UID(Unique ID)로 생성합니다.
+즉, Pod가 삭제되면 그 안에 있는 내용들을 잃어버리게 됩니다.
+VM에 빗대자면 VM을 생성하는 template을 가지고 새로운 VM을 생성하며, 삭제할 경우 해당 VM을 완전히 삭제한다는 개념입니다.
+이 때 volume도 Pod가 삭제되면 삭제됩니다.
 
 ## Pod Lifecycle
 
-Pod의 `status` 필드는 PodStatus의 `phase` 필드이다.
+Pod의 `status` 필드는 PodStatus의 `phase` 필드입니다.
+Pod의 phase는 간단하게 Pod가 위치한 lifecycle의 상위 개념에서의 요약정보입니다.
 
-Pod의 phase는 간단하게 Pod가 위치한 lifecycle의 상위 개념에서의 요약이다.
-
-`phase` 의 value들
+`phase` 의 value들에는 다음과 같은 것들이 있습니다.
 
 * `Pending` : Pod가 kubernetes 시스템에 의해 받아들여졌지만 하나 이상의 container image가 생성되지 않은 상태.
-* `Running` : Pod가 node에 바운드되고 모든 container들이 생성되었다. 최소한 하나의 container가 실행 중이거나 시작 또는 재시작 중이다.
-* `Succeeded` : 모든 container가 성공적으로 종료되었고, 재시작되지 않는다.
-* `Failed` : 모든 container가 정료되었고, 최소 하나의 container가 failure 상태이다.
-* `Unknown` : 어떤 이유로 인해 Pod의 state를 얻어낼 수 없다. 보통 파드의 호스트와 통신이 안되는 문제.
+* `Running` : Pod가 node에 바운드되고 모든 container들이 생성됨. 최소한 하나의 container가 실행 중이거나 시작 또는 재시작 중.
+* `Succeeded` : 모든 container가 성공적으로 종료되었고, 재시작되지 않음.
+* `Failed` : 모든 container가 정료되었고, 최소 하나의 container가 failure 상태.
+* `Unknown` : 어떤 이유로 인해 Pod의 state를 얻어낼 수 없음. 보통 Pod의 호스트와 통신이 안되는 문제.
 
-Container probe
+### Container probe
 
-`kubelet`이 container에 대해 수행하는 진단.
-container에서 구현된 Handler를 호출함.
+`kubelet`이 container을 진단할 때 사용하는 것입니다.
+container에서 구현된 Handler를 호출하여 이러한 진단을 수행합니다.
 
-* ExecAction: 컨테이너 내부에서 지정된 명령어를 실행한다. 종료 코드가 0이면 성공.
-* TCPSocketAction: Container의 IP 주소에서 특정 port에 대해 TCP를 확인한다. port가 열려있으면 성공.
-* HTTPGetAction: HTTP Get 요청을 한다. `200<= status code > 400`일 경우 성공.
+크게 3가지 probe가 있습니다.
 
-3가지 probe들
-
-* `livenessProbe`: container가 실행 중인지 나타냄. liveness probe가 실패하면 `kubelet`은 container를 죽이고, 이 컨테이너는 restart policy를 실행한다.
+* `livenessProbe`: container가 실행 중인지 나타냄. liveness probe가 실패하면 `kubelet`은 container를 죽이고, 이 container는 restart policy를 실행한다.
 * `redinessProbe`: container가 service requests를 받을 준비가 되었는지 나타냄. readiness probe가 실패할 경우 endpoint controller는 Pod의 IP 주소를 Pod와 매칭되는 Service들의 endpoints에서 삭제한다. initial delay 이전의 default 값은 `Failure`이다.
 * `startupProbe`: container 내부의 application이 시작되었는지를 나타냄. 다른 probe들은 startup probe가 성공할 때까지 비활성화 상태.
 
-`livenessProbe`를 사용해야하는 상황
+#### `livenessProbe`를 사용해야하는 상황
 
 container가 crash되었을 때 실행하는 process가 이미 있다면 사실 `livenessProbe`는 사용하지 않아도 됨. 만약 container에 문제가 있을 때 이를 재시작하고 싶으면 `livenessProbe`를 지정하고 `restartPolicy`를 설정한다.
 
-`readinessProbe`를 사용해야하는 상황
+#### `readinessProbe`를 사용해야하는 상황
 
 probe가 성공했을 때에만 트래픽을 흘리고 싶은 경우 사용.
 단순하게 삭제할 때 트래픽이 안흐르게 하고 싶은 경우에는 사용하지 않아도 알아서 됨.
 
-`startupProbe`를 사용해야하는 상황
+#### `startupProbe`를 사용해야하는 상황
 
-컨테이너가 `initialDelaySeconds + failureThreshold × periodSeconds` 이후에 시작될 경우 사용해야함.
+container가 `initialDelaySeconds + failureThreshold × periodSeconds` 이후에 시작될 경우 사용해야함.
 
 Restart policy
 
@@ -110,7 +111,7 @@ Restart policy
 Pod lifetime
 
 일반적으로 Pod는 사람 또는 컨트롤러가 명백하게 이를 지우지 않는 이상 유지된다.
-control plane은 파드의 총 개수가 지정된 threshold를 초과하면 종료된 파드들(`Succeeded` 또는 `Failed`)를 삭제한다.
+control plane은 Pod의 총 개수가 지정된 threshold를 초과하면 종료된 Pod들(`Succeeded` 또는 `Failed`)를 삭제한다.
 
 컨트롤러는 3가지 타입이 있다.
 
@@ -168,11 +169,11 @@ Init container가 실패 시 계속해서 재시작 되는 것을 막으려면 P
 * user가 pod specification을 업데이트 하여 init container의 이미지가 변경되었다.
   App container image의 변화는 app container만 재시작시킨다.
 * Pod infrastructure container가 재시작 되었을 때
-* `restartPolicy`가 `Always`로 설정이 되어있는 상태에서 파드가 재시작 되었을 때 init container가 이전 완료 상태를 저장한 것이 만료되거나 없을 경우
+* `restartPolicy`가 `Always`로 설정이 되어있는 상태에서 Pod가 재시작 되었을 때 init container가 이전 완료 상태를 저장한 것이 만료되거나 없을 경우
 
 ## Disruptions
 
-파드는 원래 누군가가(사람 또는 컨트롤러) 지우지 않는다면, 또는 피할 수 없는 하드웨어, 소프트웨어적인 에러가 아니라면 삭제되지 않는다.
+Pod는 원래 누군가가(사람 또는 컨트롤러) 지우지 않는다면, 또는 피할 수 없는 하드웨어, 소프트웨어적인 에러가 아니라면 삭제되지 않는다.
 
 여기서 `unavoidable`인 경우를 involuntary disruptions라고 부를 것이다. 예시는 다음과 같다.
 
@@ -206,14 +207,14 @@ Cluster Administrator는 다음을 할 수도 있다.
 `PodDisruptionBudget(PDB)`를 각 application에 설정할 수 있다.
 이는 voluntary disruption 상황에서 동시에 down될 수 있는 pod의 갯수를 제한한다.
 
-`PodDisruptionBudget(PDB)`를 사용하려면 Cluster Manager는 Eviction API를 통해서 파드를 삭제해야한다.
+`PodDisruptionBudget(PDB)`를 사용하려면 Cluster Manager는 Eviction API를 통해서 Pod를 삭제해야한다.
 직접 삭제할 경우 동작하지 않는다.
 `kubectl drain`같은 것이 있다.
 
 `PodDisruptionBudget(PDB)`는 involuntary disruption 상황에서는 작동하지 않는다.
 하지만 몇개가 종료되는지는 기록하여 budget에 추가한다.
 
-Rolloing upgrade 때문에 파드가 삭제되거나 사용 불가능한 상태일 때에도 `PodDisruptionBudget(PDB)`는 이를 카운트하지만 PDB때문에 제한되지는 않는다.
+Rolloing upgrade 때문에 Pod가 삭제되거나 사용 불가능한 상태일 때에도 `PodDisruptionBudget(PDB)`는 이를 카운트하지만 PDB때문에 제한되지는 않는다.
 application의 업데이트 동안 발생한 장애처리는 controller spec에서 정의내린대로 한다.
 
 [^1]: 멱등법칙. 여러번 실행하더라도 동일한 결과를 냄.
