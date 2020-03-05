@@ -2,6 +2,7 @@ baseURL = "http://kimmj.github.io/"
 languageCode = "en-us"
 title = "Ibiza"
 
+googleAnalytics = "UA-123-45"
 
 theme = [ "mj-custom-theme", "hugo-theme-learn" ]
 
