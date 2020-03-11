@@ -27,6 +27,8 @@ googleAnalytics = "UA-123-45"
 
 만약 yaml이라면 `googleAnalytics: "UA-123-45"` 정도로 설정하면 될 것 같습니다.
 
+여기서 해당 코드를 github에 올릴 때 안전하게 올리고 싶으시다면, [git-secret](/git/git-secret)을 참조하시기 바랍니다.
+
 ### `header.html`에 추가
 
 자신이 사용하는 theme에서 `layouts/partials`로 이동하면 header.html이라는 파일이 있을 것입니다.
