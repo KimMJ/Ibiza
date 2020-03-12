@@ -410,7 +410,6 @@ playbook을 사용하여 새로운 서버를 provision 하고, playbook 안에�
 5개의 다른 place에서 동일한 variable을 정의하였을 때어떤 variable이 사용되고 있는지에 대한 자세한 사항을 파고드는 경우는 드물 것이다.
 그러나 만일을 대비하여 Ansible documentation에서는 다음과 같은 순서를 사용한다.
 
-
 1. command line을 통해 전달된 variable(`-e` option)이 항상 승리한다.
 2. inventory에 정의된 variable connection (`ansible_ssh_user` 등)
 3. 대부분의 모든 것 (command line switch, play에 정의된 variable, 내장된 variable, role variable 등)
