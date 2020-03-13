@@ -11,3 +11,5 @@ pre: "<i class='fas fa-angle-right'></i>&nbsp;"
 # Tips
 
 spinnaker를 운영하며 생기는 팁들을 모아보았습니다.
+
+{{% children %}}

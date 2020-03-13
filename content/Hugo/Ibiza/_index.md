@@ -11,3 +11,5 @@ pre: "<i class='fas fa-angle-right'></i>&nbsp;"
 # Ibiza
 
 Ibiza는 이 블로그를 만드는 프로젝트입니다.
+
+{{% children %}}

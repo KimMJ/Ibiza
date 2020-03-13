@@ -9,3 +9,5 @@ pre: "<i class='fas fa-angle-right'></i>&nbsp;"
 # Hugo
 
 fast static website engine
+
+{{% children %}}

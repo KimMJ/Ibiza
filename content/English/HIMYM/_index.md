@@ -11,3 +11,5 @@ pre: "<i class='fas fa-angle-right'></i>&nbsp;"
 # How I Met Your Mother
 
 Script : https://www.springfieldspringfield.co.uk/episode_scripts.php?tv-show=how-i-met-your-mother
+
+{{% children %}}

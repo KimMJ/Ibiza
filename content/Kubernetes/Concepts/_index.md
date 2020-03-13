@@ -9,3 +9,5 @@ pre: "<i class='fas fa-angle-right'></i>&nbsp;"
 ### Kubernetes
 
 # Concepts
+
+{{% children %}}

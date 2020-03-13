@@ -11,3 +11,5 @@ pre: "<i class='fas fa-angle-right'></i>&nbsp;"
 # Install
 
 Install Kubernetes on bare-metal
+
+{{% children %}}

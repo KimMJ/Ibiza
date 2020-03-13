@@ -7,3 +7,5 @@ pre: "<i class='fas fa-angle-right'></i>&nbsp;"
 ---
 
 # Docker
+
+{{% children %}}

@@ -14,3 +14,5 @@ draft: false
 spinnaker를 설치해 볼 것입니다.
 
 쉽지 않았던 여정들을 기록하려고 합니다.
+
+{{% children %}}
