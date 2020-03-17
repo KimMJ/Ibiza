@@ -33,7 +33,7 @@ pre: "<i class='fas fa-minus'></i>&nbsp;"
 `gsutil`이 설치되어 있어야 합니다.
 
 ```bash
-gsutil -m cp -r gs://halconfig
+gsutil -m cp -r gs://halconfig .
 ```
 
 이렇게하면 로컬에 `halconfig`라는 폴더가 생겼을 것입니다.
@@ -208,6 +208,7 @@ Image Registry가 kubernetes-spinnaker로 변경된 것을 주의하시면 됩�
 hal deploy apply
 ```
 
-#### Reference
+## Reference
+
 https://www.spinnaker.io/guides/operator/custom-boms/  
 https://github.com/spinnaker/spinnaker/issues/3967#issuecomment-522306893

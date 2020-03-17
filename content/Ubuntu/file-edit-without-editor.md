@@ -51,7 +51,7 @@ bbbb
 ```bash
 $ cat file
 asdf
-$ cat > file
+$ cat >> file
 aaaa
 bbbb
 ^D # Command+D
@@ -66,7 +66,7 @@ bbbb
 ```bash
 $ cat file
 asdf
-$ cat > file
+$ cat <<EOF > file
 aaaa
 bbbb
 EOF
