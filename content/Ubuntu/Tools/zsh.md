@@ -1,5 +1,5 @@
 ---
-title: "Zsh 설치 및 설정"
+title: "zsh 설치 및 설정"
 date:  2020-02-29T02:26:34+09:00
 weight: 10
 draft: true
