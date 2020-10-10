@@ -66,7 +66,7 @@ A에서 B로 ssh 접속을 하고 있습니다.
 이런 상황에서 `-R` 옵션을 주면 B에서도 A로 접속할 수 있습니다.
 
 ```bash
-ssh 12345:localhost:22 user@server-b.com
+ssh -R 12345:localhost:22 user@server-b.com
 ```
 
 해당 설정은 A서버에서 접속하는 localhost의 22 포트를 B서버의 12345 포트와 연결하라는 의미입니다.
