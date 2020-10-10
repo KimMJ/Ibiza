@@ -1,7 +1,7 @@
 ---
 title: "05 Application Lifecycle Management"
 date:  2020-04-19T17:02:09+09:00
-weight: 10
+weight: 5
 draft: false
 tags: ["kubernetes", "cks"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"

@@ -1,7 +1,7 @@
 ---
 title: "08 Storage"
 date:  2020-05-04T02:34:12+09:00
-weight: 10
+weight: 8
 draft: false
 tags: ["kubernetes", "cka"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"

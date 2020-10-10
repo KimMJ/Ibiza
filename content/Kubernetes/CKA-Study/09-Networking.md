@@ -1,7 +1,7 @@
 ---
 title: "09 Networking"
 date:  2020-05-04T18:12:04+09:00
-weight: 10
+weight: 9
 draft: false
 tags: ["kubernetes", "cka"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"

@@ -1,7 +1,7 @@
 ---
 title: "14 Other Topics"
 date:  2020-06-15T21:19:17+09:00
-weight: 10
+weight: 14
 draft: false
 tags: ["kubernetes", "cka"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"

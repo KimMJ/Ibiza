@@ -1,7 +1,7 @@
 ---
 title: "07 Security"
 date:  2020-04-25T20:26:41+09:00
-weight: 10
+weight: 7
 draft: false
 tags: ["kubernetes", "cka"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"

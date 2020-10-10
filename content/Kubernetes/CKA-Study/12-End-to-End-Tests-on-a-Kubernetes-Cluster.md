@@ -1,7 +1,7 @@
 ---
 title: "12 End to End Tests on a Kubernetes Cluster"
 date:  2020-06-15T19:39:06+09:00
-weight: 10
+weight: 12
 draft: false
 tags: ["kubernetse", "cka"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"

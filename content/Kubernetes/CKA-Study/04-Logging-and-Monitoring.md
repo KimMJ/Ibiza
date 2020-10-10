@@ -1,7 +1,7 @@
 ---
 title: "04 Logging and Monitoring"
 date:  2020-04-18T21:47:08+09:00
-weight: 10
+weight: 4
 draft: false
 tags: ["kubernetes", "cka"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"

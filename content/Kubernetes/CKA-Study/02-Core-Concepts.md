@@ -1,7 +1,7 @@
 ---
 title: "02 Core Concepts"
 date:  2020-04-14T00:42:25+09:00
-weight: 10
+weight: 2
 draft: false
 tags: ["kubernetes", "cka"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"

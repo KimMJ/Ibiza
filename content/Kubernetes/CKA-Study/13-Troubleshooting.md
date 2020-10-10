@@ -1,7 +1,7 @@
 ---
 title: "13 Troubleshooting"
 date:  2020-06-15T20:23:00+09:00
-weight: 10
+weight: 13
 draft: false
 tags: ["kubernetes", "cka"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"

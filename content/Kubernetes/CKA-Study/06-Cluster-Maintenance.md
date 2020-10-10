@@ -1,7 +1,7 @@
 ---
 title: "06 Cluster Maintenance"
 date:  2020-04-24T13:09:30+09:00
-weight: 10
+weight: 6
 draft: false
 tags: ["kubernetes", "cka"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"

@@ -1,7 +1,7 @@
 ---
 title: "03 Scheduling"
 date:  2020-04-15T18:55:03+09:00
-weight: 10
+weight: 3
 draft: false
 tags: ["kubernetes", "cka"]
 pre: "<i class='fas fa-minus'></i>&nbsp;"
