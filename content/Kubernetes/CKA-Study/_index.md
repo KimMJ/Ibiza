@@ -6,6 +6,6 @@ chapter: true
 pre: "<i class='fas fa-angle-right'></i>&nbsp;"
 ---
 
-# Chapter X
+# CKA Study
 
 {{% children %}}
