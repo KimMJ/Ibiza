@@ -15,6 +15,10 @@ pre: "<i class='fas fa-minus'></i>&nbsp;"
 외부 서비스를 이용하는 것이 아니라 내부에 이미지 파일을 저장하기 때문에 사내 보안 정책에도 알맞게 사용할 수 있다.
 아니면 필요에 따라 `S3`나 `Minio`를 사용할 수 있을듯 하다.
 
+특히 20년 11월부터 Docker Hub의 기본 정책이 image pull rate를 제한하는 것이 되었는데, 사내에서는 보통 forward proxy를 이용하므로
+이러한 image pull rate를 초과할 가능성이 매우 높다.
+이러한 경우에 Harbor와 같은 private docker registry를 구축하면 큰 도움이 될 것이다.
+
 ## 주요 기능
 
 사내에서 사용하며 편리하다고 생각되었던 몇가지 기능들을 소개한다.
