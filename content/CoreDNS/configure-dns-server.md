@@ -1,7 +1,10 @@
 ---
 title: "CoreDNS를 통한 Dns Server 구축하기 with docker"
 date: 2020-11-21T01:14:13+09:00
-draft: true
+weight: 10
+draft: false
+tags: ["docker", "docker-compose", "network", "bridge", "container"]
+pre: "<i class='fas fa-minus'></i>&nbsp;"
 ---
 
 `CoreDNS`는 `kubernetes`에서 dns resolve를 위해 사용하고 있는 오픈소스이다.
