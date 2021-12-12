@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: install git-secret
-        run: "apt install git-secret -y"
+        run: "sudo apt install git-secret -y"
 
       - name: Configure GPG Key
         run: |
