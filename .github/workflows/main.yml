@@ -9,17 +9,10 @@ jobs:
   deploy:
     runs-on: ubuntu-20.04
     steps:
-      - name: install git-secret
-        run: "sudo apt install git-secret -y"
-
-      - name: Configure GPG Key
-        run: |
-          echo -n "$GPG_SIGNING_KEY" | base64 --decode | gpg --import
+      - name: copy config.toml
+        run: echo "${{ CONFIG_TOML }}" > config.toml
         env:
-          GPG_SIGNING_KEY: ${{ secrets.GPG_KEY }}
-
-      - name: decode secret
-        run: "git secret reveal -f"
+          CONFIG_TOML: ${{ secrets.config }}
 
       - uses: actions/checkout@v2
         with:
