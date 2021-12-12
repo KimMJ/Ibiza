@@ -13,6 +13,7 @@ jobs:
         with:
           token: ${{ secrets.GIT_TOKEN }}
           submodules: recursive
+
       - name: copy config.toml
         run: echo "${CONFIG_TOML}" > config.toml
         env:
@@ -26,8 +27,12 @@ jobs:
 
       - name: Build
         run: hugo --minify
+
       - name: site-verification
         run: echo "${{ secrets.SITE_VERIFICATION }}" > ./public/google34bf590cfe76298c.html
+
+      - name: ads.txt
+        run: echo "${{ secrets.ADS_TXT }}" > ./public/ads.txt
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
