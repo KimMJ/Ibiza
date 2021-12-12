@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: copy config.toml
-        run: echo "${{ CONFIG_TOML }}" > config.toml
+        run: echo "${ CONFIG_TOML }" > config.toml
         env:
           CONFIG_TOML: ${{ secrets.config }}
 
