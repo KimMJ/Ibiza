@@ -9,6 +9,9 @@ jobs:
   deploy:
     runs-on: ubuntu-20.04
     steps:
+      - name: install git-secret
+        run: "apt install git-secret -y"
+
       - name: Configure GPG Key
         run: |
           echo -n "$GPG_SIGNING_KEY" | base64 --decode | gpg --import
