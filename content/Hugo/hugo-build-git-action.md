@@ -1,5 +1,5 @@
 ---
-title: "Hugo Build Git Action"
+title: "Git Action으로 hugo build 자동화 하기"
 date: 2021-12-12T23:16:34+09:00
 draft: false
 ---
